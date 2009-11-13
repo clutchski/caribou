@@ -47,9 +47,16 @@ def transaction(conn):
     try:
         yield
         conn.commit()
-    except Exception, error:
+    except:
         conn.rollback()
-        raise error
+        m = "error in transaction: %s" % traceback.format_exc()
+        raise Error(m)
+
+def function_transaction(function):
+    def _wrapped(conn):
+        with transaction(conn):
+            function(conn)
+    return _wrapped
 
 def has_method(an_object, method_name):
     return hasattr(an_object, method_name) and \
