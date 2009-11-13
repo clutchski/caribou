@@ -87,13 +87,9 @@ class Migration(object):
 
     def upgrade(self, conn):
         self.module.upgrade(conn)
-        print 'upgraded migration %s' % self.get_version()
 
     def downgrade(self, conn):
         self.module.downgrade(conn)
-        version = self.get_version()
-        update_version(conn, version)
-        print 'downgraded migration %s' % self.get_version()
 
     def __cmp__(self, other):
         # compare by version number
