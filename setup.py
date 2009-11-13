@@ -13,9 +13,6 @@ EMAIL = 'clutchski@gmail.com'
 URL = 'http://github.com/clutchski/caribou'
 LICENSE = 'Public Domain'
 
-if sys.version_info < (2,5):
-    raise NotImplementedError("Sorry, you need at least Python 2.5 to use caribou")
-
 setup( name = NAME
      , version = VERSION
      , description = DESC
