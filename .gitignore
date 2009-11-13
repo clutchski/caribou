@@ -1,0 +1,6 @@
+*.pyc
+.*.sw*
+dist/
+MANIFEST
+caribou.egg-info/
+*.*~
