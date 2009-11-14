@@ -5,3 +5,4 @@ build/
 MANIFEST
 caribou.egg-info/
 *.*~
+README.html
