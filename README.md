@@ -1,9 +1,13 @@
 Caribou SQLite Migrations
 ====================
 
-Caribou is a simple [Python][python] [migrations][rails] library for [SQLite][sqlite]
-databases. It is built to manage the evoluton of client side databases over
-multiple releases of an application.
+<div style="left: right; padding: 0px 0px 2em 2em">
+    <img src="http://imgur.com/DySrz.jpg" alt="Caribou" />
+</div>
+
+Caribou is a simple [Python][python] library for library for [SQLite][sqlite]
+database [migrations][rails]. built primarily to manage the evoluton of client
+side databases over multiple releases of an application.
 
   [rails]:http://guides.rubyonrails.org/migrations.html 
   [python]: http://python.org/
@@ -16,13 +20,13 @@ Example
 
 caribou create [-d DIRECTORY] MIGRATION_NAME
 
-#### Add your schema changes
-
+#### update your schema 
     """
-    an example of a caribou migration file
+    an example of a Caribou migration file
     """
     
     def upgrade(connection):
+        # connection is a plain old sqlite3 database connection
         sql = """
             create table animals
             ( name     TEXT
@@ -46,7 +50,7 @@ caribou create [-d DIRECTORY] MIGRATION_NAME
 #### Run your migrations:
 
     """
-    an example illustrating how to run a caribou migration
+    an example illustrating how to run a Caribou migration. Caribou
     """
     
     import caribou
@@ -73,12 +77,24 @@ using setuptools:
 
     sudo easy_install caribou
 
-or, to install trunk:
+or, [download][download] and extract the most code in the repo, and
+run:
 
     sudo python setup.py install
 
+[download]:http://github.com/clutchski/caribou/archives/master
+
 Licence
--------------
+--------
 
     Caribou is in the public domain.
+
+Appendix
+--------
+
+* [Additional Reading][migration]
+* [Additional Listening][music]
+
+[migration]: http://en.wikipedia.org/wiki/Caribou#Migration
+[music]: http://www.myspace.com/cariboumanitoba
 
