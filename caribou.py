@@ -7,6 +7,7 @@ http://en.wikipedia.org/wiki/Caribou#Migration
 from __future__ import with_statement
 
 import contextlib
+import datetime
 import glob
 import imp
 import os.path
@@ -178,4 +179,38 @@ def downgrade(db_url, migration_dir, version):
             next_migration = migrations[next_i]
             next_version = next_migration.get_version()
         update_version(conn, next_version)
+
+def get_next_version():
+    now = datetime.datetime.now()
+    return now.strftime("%Y%m%d%H%M%S")
+
+def create_migration(name, directory=None):
+    if not directory:
+        directory = '.'
+    version = get_next_version()
+    contents = MIGRATION_TEMPLATE % {'name':name, 'version':version}
+    name = name.replace(' ', '_')
+    filename = "%s_%s.py" % (version, name)
+    path = os.path.join(directory, filename)
+    with open(path, 'w') as f:
+        f.write(contents)
+    return path
+
+MIGRATION_TEMPLATE = """\
+\"\"\"
+a caribou migration
+
+name: %(name)s 
+version: %(version)s
+\"\"\"
+
+def upgrade(connection):
+    # add your upgrade step here
+    pass
+
+def downgrade(connection):
+    # add your downgrade step here
+    pass
+"""
+
 

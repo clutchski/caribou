@@ -6,6 +6,7 @@ from __future__ import with_statement
 
 import glob
 import os
+import shutil
 import sqlite3
 
 import caribou
@@ -160,4 +161,22 @@ class TestCaribouMigrations(object):
             assert all((self._table_exists(conn, t) for t in tables))
             actual_version = caribou.get_version(conn)
             assert actual_version == v3, '%s != %s' % (actual_version, v3)
+
+    def test_create_migration(self):
+        """ assert we can create migraiton templates """
+        for name, directory in [ ('tc_1', None), ('tc_2', 'test_create__')]:
+            if directory and not os.path.exists(directory):
+                os.makedirs(directory)
+            path = caribou.create_migration(name, directory)
+            try:
+                assert os.path.exists(path)
+                # assert it is a valid migration
+                caribou.Migration(path)
+            finally:
+                # remove compiled test migration as well
+                for path in [path, path + 'c']:
+                    if os.path.exists(path):
+                        os.remove(path)
+                if directory and os.path.exists(directory):
+                    shutil.rmtree(directory)
 

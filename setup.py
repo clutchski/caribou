@@ -23,6 +23,7 @@ setup( name = NAME
      , license = LICENSE
      , platforms = 'any'
      , py_modules=['caribou']
+     , scripts=['bin/caribou']
      , classifiers=\
          [ 'Development Status :: 4 - Beta'
          , 'Intended Audience :: Developers'

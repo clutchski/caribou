@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+"""
+this module contains the command line interface for caribou
+"""
+
+import optparse
+import sys
+
+import caribou
+
+# exit codes
+
+FAILURE = 1
+SUCCESS = 0
+
+# commands
+
+CREATE = 'create'
+VERSION = 'version'
+UPGRADE = 'upgrade'
+DOWNGRADE = 'downgrade'
+
+class out(object):
+
+    @staticmethod
+    def error(message):
+        sys.stderr.write('%s\n' % message)
+    
+    @staticmethod
+    def info(message):
+        sys.stdout.write('%s\n' % message)
+
+def main():
+    opp = optparse.OptionParser()
+    opp.add_option('-d', dest="directory", help="migrations dir")
+    (options, arguments) = opp.parse_args()
+    if not arguments:
+        opp.print_help()
+        return FAILURE
+    command = arguments.pop(0)
+    # create migrations command
+    if command == CREATE:
+        if not arguments:
+            msg = "supply a migration name"
+            out.error(msg)
+            return FAILURE
+        name = arguments.pop(0)
+        directory = options.directory
+        path = caribou.create_migration(name, directory)
+        out.info("created migration %s" % path)
+        
+if __name__ == '__main__':
+    sys.exit(main())
