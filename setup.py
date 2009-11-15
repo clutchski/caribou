@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import sys
 import os.path
 from setuptools import setup
 
-NAME = 'Caribou'
+NAME = 'caribou'
 VERSION = '0.2'
 DESC = "python migrations for sqlite databases"
 LONG_DESC = """\
