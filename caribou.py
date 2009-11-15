@@ -25,10 +25,8 @@ UTC_LENGTH = 14
 # errors
 
 class Error(Exception): pass
-
 class InvalidMigrationError(Error): pass
-
-class InvalidNameError(InvalidMigrationError):
+class InvalidNameError(Error):
 
     def __init__(self, filename):
         msg = 'migration filenames must start with a UTC timestamp. ' \
@@ -57,14 +55,17 @@ def transaction(conn):
         raise Error(m)
 
 def function_transaction(function):
-    def _wrapped(conn):
+    def decorator(conn):
         with transaction(conn):
             function(conn)
-    return _wrapped
+    return decorator
 
 def has_method(an_object, method_name):
     return hasattr(an_object, method_name) and \
                     callable(getattr(an_object, method_name))
+
+def is_directory(path):
+    return os.path.exists(path) and os.path.isdir(path)
 
 class Migration(object):
     """ represents one migration file """
@@ -73,8 +74,7 @@ class Migration(object):
         self.path = path
         self.filename = os.path.basename(path)
         self.module_name, _ = os.path.splitext(self.filename)
-        # call get_version, will assert the filename works
-        self.get_version()
+        self.get_version() # will assert the filename is valid
         self.name = self.module_name[UTC_LENGTH:]
         while self.name.startswith('_'):
             self.name = self.name[1:]
@@ -199,15 +199,21 @@ def get_migrations(directory, target_version=None, reverse=False):
     return the migrations in the directory, sorted by version number. if a
     target version is passed, assert a migration with that version exists
     """
+    if not is_directory(directory):
+        msg = "%s is not a directory" % directory
+        raise Error(msg)
     wildcard = os.path.join(directory, '*.py')
     migration_files = glob.glob(wildcard)
     migrations = [Migration(f) for f in migration_files]
     if target_version and not migration_exists(migrations, target_version):
         m = "no migration exists with version [%s]" % target_version
-        raise InvalidMigrationError(m)
+        raise Error(m)
     return sorted(migrations, key=lambda x: x.get_version(), reverse=reverse)
     
 def upgrade(db_url, migration_dir, version=None):
+    if not is_directory(migration_dir):
+        msg = "%s is not a directory" % migration_dir
+        raise Error(msg)
     db = Database(db_url)
     if not db.is_version_controlled():
         db.initialize_version_control()
@@ -215,9 +221,13 @@ def upgrade(db_url, migration_dir, version=None):
     db.upgrade(migrations, version)
 
 def downgrade(db_url, migration_dir, version):
+    if not is_directory(migration_dir):
+        msg = "%s is not a directory" % migration_dir
+        raise Error(msg)
     db = Database(db_url)
     if not db.is_version_controlled():
-        m = "Can't downgrade %s because it is not version controlled." % db_url
+        m = "Can't downgrade %s because it is not version controlled." % (
+                                                                    db_url)
         raise Error(m)
     target_version = version
     if version == '0':
@@ -230,8 +240,10 @@ def get_version(db_url):
     return db.get_version()
 
 def create_migration(name, directory=None):
-    if not directory:
-        directory = '.'
+    directory = directory if directory else '.'
+    if not is_directory(directory):
+        msg = '%s is not a directory' % directory
+        raise Error(msg)
     def get_next_version():
         now = datetime.datetime.now()
         return now.strftime("%Y%m%d%H%M%S")
