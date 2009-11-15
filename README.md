@@ -18,9 +18,13 @@ Example
 
 #### Create a migration
 
-caribou create [-d DIRECTORY] MIGRATION_NAME
+run from the command line:
 
-#### update your schema 
+    > caribou create [-d DIRECTORY] my_first_migration
+    "created migration 20091114190521_my_first_migration.py"
+
+#### update your newly created migration file 
+
     """
     an example of a Caribou migration file
     """
@@ -38,7 +42,7 @@ caribou create [-d DIRECTORY] MIGRATION_NAME
                   , ('bengal tiger', 'threatened')
                   , ('eastern elk', 'extinct')
                   ]
-        sql = 'insert into animals values (:1, :2)
+        sql = 'insert into animals values (:1, :2)'
         for name, status in animals:
             connection.execute(sql, [name, status])
     
@@ -50,7 +54,7 @@ caribou create [-d DIRECTORY] MIGRATION_NAME
 #### Run your migrations:
 
     """
-    an example illustrating how to run a Caribou migration. Caribou
+    an example illustrating how to run a migration programmatically.
     """
     
     import caribou
