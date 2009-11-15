@@ -5,7 +5,7 @@ import os.path
 from setuptools import setup
 
 NAME = 'caribou'
-VERSION = '0.1'
+VERSION = '0.2'
 DESC = "python migrations for sqlite databases"
 LONG_DESC = DESC
 AUTHOR = 'clutchski'
