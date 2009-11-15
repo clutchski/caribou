@@ -4,10 +4,14 @@ import sys
 import os.path
 from setuptools import setup
 
-NAME = 'caribou'
+NAME = 'Caribou'
 VERSION = '0.2'
 DESC = "python migrations for sqlite databases"
-LONG_DESC = DESC
+LONG_DESC = """\
+Caribou is a simple SQLite database migrations library, built primarily
+to manage the evoluton of client side databases over multiple releases 
+of an application.
+"""
 AUTHOR = 'clutchski'
 EMAIL = 'clutchski@gmail.com'
 URL = 'http://github.com/clutchski/caribou'
