@@ -3,6 +3,6 @@
 dist/*
 build/*
 MANIFEST
-caribou.egg-info/*
+*aribou.egg-info/*
 *.*~
 README.html
