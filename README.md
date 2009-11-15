@@ -1,5 +1,5 @@
 Caribou SQLite Migrations
-====================
+=========================
 
 <div style="left: right; padding: 0px 0px 2em 2em">
     <img src="http://imgur.com/DySrz.jpg" alt="Caribou" />
@@ -16,14 +16,20 @@ side databases over multiple releases of an application.
 Example
 -------
 
-#### Create a migration
+Here is a simple example illustrating how to use Caribou to manage your SQLite
+schema:
 
-run from the command line:
+#### Create a Migration
 
-    > caribou create [-d DIRECTORY] my_first_migration
-    "created migration 20091114190521_my_first_migration.py"
+Use Caribou's command line tool to create your first migration:
+    
+    clutchski@shaolin:~$ caribou create my_first_migration
+    created migration ./20091115140758_my_first_migration.py
 
-#### update your newly created migration file 
+#### Edit Your Migration
+
+Let's create a table with some data in the upgrade step and reverse the changes
+in the downgrade step.
 
     """
     an example of a Caribou migration file
@@ -51,7 +57,22 @@ run from the command line:
     def downgrade(connection):
         connection.execute('drop table animals')
 
-#### Run your migrations:
+#### Run Your Migration:
+
+Caribou migrations can be run with the command line tool:
+
+    clutchski@shaolin:~$ caribou upgrade my_sqlite_db .
+    upgrading db [my_sqlite_db] to most recent version
+    upgraded [my_sqlite_db] successfully to version [20091115140758]
+
+    # if you want to revert your changes, uses the downgrade command:
+
+    clutchski@shaolin:~$ caribou downgrade my_sqlite_db . 0
+    downgrading db [my_sqlite_db] to version [0]
+    downgraded [my_sqlite_db] successfully to version [0]
+
+Since Caribou is built to manage client side sqlite databases, it can also be
+run programmatically from within your application:
 
     """
     an example illustrating how to run a migration programmatically.
@@ -59,9 +80,9 @@ run from the command line:
     
     import caribou
     
-    db_path = '/path/to/db.sqlite3'
+    db_path = 'my_sqlite_db' 
     migrations_path = '/path/to/migrations/dir'
-    version = '20091114132332'
+    version = '20091115140758'
     
     # upgrade to most recent version
     caribou.upgrade(db_version, migrations_path)
@@ -72,7 +93,7 @@ run from the command line:
     # downgrade to a specific version
     caribou.downgrade(db_path, migrations_path, version)
 
-That's it.
+That's it. You're rolling.
 
 Installation
 ------------
@@ -96,15 +117,23 @@ Licence
 Development
 -----------
 
+Things to know, before you start hacking Caribou:
+
 #### Unit Tests
 
-The unit test suite requires nose:
+The unit test suite requires the [nose][nose] unit testing library. To install:
 
     sudo easy_install nose
 
-Running, switch to the main directory and run:
+To execute the test suite, run:
+
+    python setup.py nosetests
+
+or simply:
 
     nosetests
+
+[nose]:http://somethingaboutorange.com/mrl/projects/nose/0.11.1/
 
 Appendix
 --------
