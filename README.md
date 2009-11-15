@@ -93,6 +93,19 @@ Licence
 
     Caribou is in the public domain.
 
+Development
+-----------
+
+#### Unit Tests
+
+The unit test suite requires nose:
+
+    sudo easy_install nose
+
+Running, switch to the main directory and run:
+
+    nosetests
+
 Appendix
 --------
 
