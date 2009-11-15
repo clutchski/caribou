@@ -99,17 +99,28 @@ class TestCaribouMigrations(object):
                 assert False, 'loaded invalid migration [%s]' % migration
 
     def test_unknown_migration(self):
-        """ assert we can't target an unknown migration """
+        """ assert we can't target an unknown migration or non existant dirs"""
         db_url = self.db_url
         migrations_path = self.migrations_path
         for v in ['asdf', '22341', 'asdfasdfasdf', '----']:
             for func in [caribou.upgrade, caribou.downgrade]:
                 try:
                     func(db_url, migrations_path, v)
-                except caribou.InvalidMigrationError:
+                except caribou.Error:
                     pass
                 else:
                     assert False, 'ran an unknown migration'
+        # assert we can't run non-existant migrations
+        path = '/path/to/nowhereski/whoop'
+        for func, args in [ (caribou.upgrade, (db_url, path, None))
+                          , (caribou.downgrade, (db_url, path, 0))
+                          ]:
+            try:
+                func(*args)
+            except caribou.Error:
+                pass
+            else:
+                assert False, '%s %s' % (func, str(args))
 
     def test_migration(self):
         # assert migrations haven't been run
@@ -178,7 +189,7 @@ class TestCaribouMigrations(object):
             assert actual_version == v3, '%s != %s' % (actual_version, v3)
 
     def test_create_migration(self):
-        """ assert we can create migraiton templates """
+        """ assert we can create migration templates """
         for name, directory in [ ('tc_1', None), ('tc_2', 'test_create__')]:
             if directory and not os.path.exists(directory):
                 os.makedirs(directory)
@@ -194,4 +205,11 @@ class TestCaribouMigrations(object):
                         os.remove(path)
                 if directory and os.path.exists(directory):
                     shutil.rmtree(directory)
+        # assert we can't create migrations in a directoin that doesn't exist
+        try:
+            caribou.create_migration('adsf', '/path/to/nowhereski')
+        except caribou.Error:
+            pass
+        else:
+            assert False
 
