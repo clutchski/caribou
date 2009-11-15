@@ -4,7 +4,7 @@ import os.path
 from setuptools import setup
 
 NAME = 'caribou'
-VERSION = '0.2'
+VERSION = '0.2.1'
 DESC = "python migrations for sqlite databases"
 LONG_DESC = """\
 Caribou is a simple SQLite database migrations library, built primarily
