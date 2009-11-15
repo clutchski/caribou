@@ -1,10 +1,13 @@
 """
-this module contains super simple migrations for sqlite databases
-
-http://en.wikipedia.org/wiki/Caribou#Migration
+Caribou is a simple SQLite database migrations library, built primarily
+to manage the evoluton of client side databases over multiple releases 
+of an application.
 """
 
 from __future__ import with_statement
+
+__author__ = 'clutchski'
+__email__ = 'clutchski@gmail.com'
 
 import contextlib
 import datetime
