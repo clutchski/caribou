@@ -1,6 +1,6 @@
 *.pyc
 .*.sw*
-dist/
+dist/*
 build/*
 MANIFEST
 caribou.egg-info/
