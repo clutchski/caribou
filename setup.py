@@ -2,7 +2,7 @@
 
 import sys
 import os.path
-from distutils.core import setup
+from setuptools import setup
 
 NAME = 'caribou'
 VERSION = '0.1'
@@ -24,6 +24,7 @@ setup( name = NAME
      , platforms = 'any'
      , py_modules=['caribou']
      , scripts=['bin/caribou']
+     , install_requires=["argparse>=1.0.0"]
      , classifiers=\
          [ 'Development Status :: 4 - Beta'
          , 'Intended Audience :: Developers'
