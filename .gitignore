@@ -6,3 +6,5 @@ MANIFEST
 *aribou.egg-info/*
 *.*~
 README.html
+*.sqlite*
+*.db
