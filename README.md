@@ -85,7 +85,7 @@ run programmatically from within your application:
     version = '20091115140758'
     
     # upgrade to most recent version
-    caribou.upgrade(db_version, migrations_path)
+    caribou.upgrade(db_path, migrations_path)
     
     # upgrade to a specific version
     caribou.upgrade(db_path, migrations_path, version)
