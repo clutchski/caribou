@@ -23,7 +23,7 @@ schema:
 
 Use Caribou's command line tool to create your first migration:
     
-    clutchski@shaolin:~$ caribou create my_first_migration
+    $ caribou create my_first_migration
     created migration ./20091115140758_my_first_migration.py
 
 #### Edit Your Migration
@@ -61,13 +61,13 @@ in the downgrade step.
 
 Caribou migrations can be run with the command line tool:
 
-    clutchski@shaolin:~$ caribou upgrade my_sqlite_db .
+    $ caribou upgrade my_sqlite_db .
     upgrading db [my_sqlite_db] to most recent version
     upgraded [my_sqlite_db] successfully to version [20091115140758]
 
     # if you want to revert your changes, uses the downgrade command:
 
-    clutchski@shaolin:~$ caribou downgrade my_sqlite_db . 0
+    $ caribou downgrade my_sqlite_db . 0
     downgrading db [my_sqlite_db] to version [0]
     downgraded [my_sqlite_db] successfully to version [0]
 
