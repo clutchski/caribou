@@ -6,8 +6,7 @@ of an application.
 
 from __future__ import with_statement
 
-__author__ = 'clutchski'
-__email__ = 'clutchski@gmail.com'
+__author__ = 'clutchski@gmail.com'
 
 import contextlib
 import datetime
