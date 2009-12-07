@@ -68,7 +68,7 @@ def is_directory(path):
     return os.path.exists(path) and os.path.isdir(path)
 
 class Migration(object):
-    """ represents one migration file """
+    """ This class represents one migration version. """
 
     def __init__(self, path):
         self.path = path
