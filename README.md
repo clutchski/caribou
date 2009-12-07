@@ -32,9 +32,9 @@ Let's create a table with some data in the upgrade step and reverse the changes
 in the downgrade step.
 
     """
-    an example of a Caribou migration file
+    An example of a Caribou migration file.
     """
-    
+
     def upgrade(connection):
         # connection is a plain old sqlite3 database connection
         sql = """
@@ -57,6 +57,9 @@ in the downgrade step.
     def downgrade(connection):
         connection.execute('drop table animals')
 
+Caribou migrations are flexible because they are plain Python files. Feel free
+to add logging, DDL transactions, anything at all. 
+
 #### Run Your Migration:
 
 Caribou migrations can be run with the command line tool:
@@ -75,7 +78,7 @@ Since Caribou is built to manage client side sqlite databases, it can also be
 run programmatically from within your application:
 
     """
-    an example illustrating how to run a migration programmatically.
+    An example illustrating how to run a migration programmatically.
     """
     
     import caribou
@@ -137,6 +140,8 @@ or simply:
 
 Appendix
 --------
+
+Haven't got enough?
 
 * [Additional Reading][migration]
 * [Additional Listening][music]
