@@ -23,9 +23,16 @@ UTC_LENGTH = 14
 
 # errors
 
-class Error(Exception): pass
-class InvalidMigrationError(Error): pass
+class Error(Exception):
+    """ Base class for all Caribou errors. """
+    pass
+
+class InvalidMigrationError(Error):
+    """ Thrown when a client migration contains an error. """
+    pass
+
 class InvalidNameError(Error):
+    """ Thrown when a client migration has an invalid filename. """
 
     def __init__(self, filename):
         msg = 'migration filenames must start with a UTC timestamp. ' \
@@ -50,8 +57,8 @@ def transaction(conn):
         conn.commit()
     except:
         conn.rollback()
-        m = "error in transaction: %s" % traceback.format_exc()
-        raise Error(m)
+        msg = "Error in transaction: %s" % traceback.format_exc()
+        raise Error(msg)
 
 def function_transaction(function):
     def decorator(conn):
@@ -88,7 +95,7 @@ class Migration(object):
         if missing:
             msg = 'Migration %s is missing required methods: %s' % (
                     self.path, ', '.join(missing))
-            raise InvalidMigrationError(m)
+            raise InvalidMigrationError(msg)
 
     def get_version(self):
         if len(self.filename) < UTC_LENGTH:
@@ -209,8 +216,8 @@ def get_migrations(directory, target_version=None, reverse=False):
     migration_files = glob.glob(wildcard)
     migrations = [Migration(f) for f in migration_files]
     if target_version and not migration_exists(migrations, target_version):
-        m = "No migration exists with version %s." % target_version
-        raise Error(m)
+        msg = "No migration exists with version %s." % target_version
+        raise Error(msg)
     return sorted(migrations, key=lambda x: x.get_version(), reverse=reverse)
     
 def upgrade(db_url, migration_dir, version=None):
@@ -259,8 +266,8 @@ def create_migration(name, directory=None):
     name = name.replace(' ', '_')
     filename = "%s_%s.py" % (version, name)
     path = os.path.join(directory, filename)
-    with open(path, 'w') as f:
-        f.write(contents)
+    with open(path, 'w') as migration_file:
+        migration_file.write(contents)
     return path
 
 MIGRATION_TEMPLATE = """\
