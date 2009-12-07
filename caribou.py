@@ -194,59 +194,63 @@ def migration_exists(migrations, version):
     return version_exists
 
 def get_migrations(directory, target_version=None, reverse=False):
-    """
-    return the migrations in the directory, sorted by version number. if a
-    target version is passed, assert a migration with that version exists
+    """ Return the migrations contained in the given directory, sorted by
+        version number. If a target version is specified, assert a migration
+        with that version number exists.
     """
     if not is_directory(directory):
-        msg = "%s is not a directory" % directory
+        msg = "%s is not a directory." % directory
         raise Error(msg)
     wildcard = os.path.join(directory, '*.py')
     migration_files = glob.glob(wildcard)
     migrations = [Migration(f) for f in migration_files]
     if target_version and not migration_exists(migrations, target_version):
-        m = "no migration exists with version [%s]" % target_version
+        m = "No migration exists with version %s." % target_version
         raise Error(m)
     return sorted(migrations, key=lambda x: x.get_version(), reverse=reverse)
     
 def upgrade(db_url, migration_dir, version=None):
-    if not is_directory(migration_dir):
-        msg = "%s is not a directory" % migration_dir
-        raise Error(msg)
-    db = Database(db_url)
-    if not db.is_version_controlled():
-        db.initialize_version_control()
-    migrations = get_migrations(migration_dir, version)
-    db.upgrade(migrations, version)
+    """ Upgrade the given database with the migrations contained in the
+        migrations directory. If a version is not specified, upgrade
+        to the most recent version.
+    """
+    with contextlib.closing(Database(db_url)) as db:
+        db = Database(db_url)
+        if not db.is_version_controlled():
+            db.initialize_version_control()
+        migrations = get_migrations(migration_dir, version)
+        db.upgrade(migrations, version)
 
 def downgrade(db_url, migration_dir, version):
-    if not is_directory(migration_dir):
-        msg = "%s is not a directory" % migration_dir
-        raise Error(msg)
-    db = Database(db_url)
-    if not db.is_version_controlled():
-        m = "Can't downgrade %s because it is not version controlled." % (
-                                                                    db_url)
-        raise Error(m)
-    target_version = version
-    if version == '0':
-        target_version = None
-    migrations = get_migrations(migration_dir, target_version, reverse=True)
-    db.downgrade(migrations, version)
+    """ Downgrade the database to the given version with the migrations
+        contained in the given migration directory.
+    """
+    with contextlib.closing(Database(db_url)) as db:
+        if not db.is_version_controlled():
+            msg = "The database %s is not version controlled." % (db_url)
+            raise Error(msg)
+        target_version = None if version == '0' else version
+        migrations = get_migrations(migration_dir, target_version, reverse=True)
+        db.downgrade(migrations, version)
 
 def get_version(db_url):
-    db = Database(db_url)
-    return db.get_version()
+    """ Return the migration version of the given database.
+    """
+    with contextlib.closing(Database(db_url)) as db:
+        return db.get_version()
 
 def create_migration(name, directory=None):
+    """ Create a migration with the given name. If no directory is specified,
+        the current working directory will be used.
+    """
     directory = directory if directory else '.'
     if not is_directory(directory):
-        msg = '%s is not a directory' % directory
+        msg = '%s is not a directory.' % directory
         raise Error(msg)
-    def get_next_version():
-        now = datetime.datetime.now()
-        return now.strftime("%Y%m%d%H%M%S")
-    version = get_next_version()
+
+    now = datetime.datetime.now()
+    version = now.strftime("%Y%m%d%H%M%S")
+
     contents = MIGRATION_TEMPLATE % {'name':name, 'version':version}
     name = name.replace(' ', '_')
     filename = "%s_%s.py" % (version, name)
