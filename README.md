@@ -5,7 +5,7 @@ Caribou SQLite Migrations
     <img src="http://imgur.com/DySrz.jpg" alt="Caribou" />
 </div>
 
-Caribou is a simple [SQLite][sqlite] database [migrations][rails] 
+Caribou is a small, simple [SQLite][sqlite] database [migrations][rails] 
 library for [Python][python], built primarily to manage the evoluton of client
 side databases over multiple releases of an application.
 
