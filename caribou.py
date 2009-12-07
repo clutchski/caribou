@@ -81,13 +81,13 @@ class Migration(object):
         try:
             self.module = imp.load_source(self.module_name, path)
         except:
-            m = "invalid migration [%s]: %s" % (path, traceback.format_exc())
-            raise InvalidMigrationError(m)
+            msg = "Invalid migration %s: %s" % (path, traceback.format_exc())
+            raise InvalidMigrationError(msg)
         # assert the migration has the needed methods
         missing = [m for m in ['upgrade', 'downgrade'] 
                       if not has_method(self.module, m)]
         if missing:
-            m = 'migration [%s] is missing required methods: %s' % (
+            msg = 'Migration %s is missing required methods: %s' % (
                     self.path, ', '.join(missing))
             raise InvalidMigrationError(m)
 
