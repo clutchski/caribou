@@ -117,13 +117,8 @@ class Database(object):
         self.db_url = db_url
         self.conn = sqlite3.connect(db_url)
 
-    def get_version(self):
-        sql = "SELECT version FROM %s" % VERSION_TABLE
-        try:
-            with execute(self.conn, sql) as cursor:
-                return cursor.fetchall()[0][0]
-        except sqlite3.OperationalError:
-            return None
+    def close(self):
+        self.conn.close()
 
     def is_version_controlled(self):
         sql = """SELECT *
@@ -162,12 +157,18 @@ class Database(object):
             self.update_version(next_version)
 
     def get_version(self):
-        """ return the database's version, or None if it is not versioned """
-        sql = "SELECT version FROM %s" % VERSION_TABLE
+        """ Return the database's version, or None if it is not under version
+            control.
+        """
         if not self.is_version_controlled():
             return None
+        sql = "SELECT version FROM %s" % VERSION_TABLE
         with execute(self.conn, sql) as cursor:
-            return cursor.fetchall()[0][0]
+            result = cursor.fetchall()
+            version = 0
+            if result:
+                version = result[0][0]
+            return version
 
     def update_version(self, version):
         sql = 'update %s set version = :1' % VERSION_TABLE
@@ -181,11 +182,14 @@ class Database(object):
         with transaction(self.conn):
             self.conn.execute(sql)
             self.conn.execute('insert into %s values (0)' % VERSION_TABLE)
-    
+
     def __repr__(self):
         return 'Database("%s")' % self.db_url
 
 def migration_exists(migrations, version):
+    """ Return True if one the given migrations has the given version, False
+        otherwise.
+    """
     version_exists = False
     for migration in migrations:
         if version == migration.get_version():
@@ -261,10 +265,10 @@ def create_migration(name, directory=None):
 
 MIGRATION_TEMPLATE = """\
 \"\"\"
-a caribou migration
+This module contains a Caribou migration.
 
-name: %(name)s 
-version: %(version)s
+Migration Name: %(name)s 
+Migration Version: %(version)s
 \"\"\"
 
 def upgrade(connection):
