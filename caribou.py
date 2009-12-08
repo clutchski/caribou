@@ -35,8 +35,8 @@ class InvalidNameError(Error):
     """ Thrown when a client migration has an invalid filename. """
 
     def __init__(self, filename):
-        msg = 'migration filenames must start with a UTC timestamp. ' \
-              'the following file has an invalid name: %s' % filename
+        msg = 'Migration filenames must start with a UTC timestamp. ' \
+              'The following file has an invalid name: %s' % filename
         super(InvalidNameError, self).__init__(msg)
 
 # code
@@ -60,12 +60,6 @@ def transaction(conn):
         msg = "Error in transaction: %s" % traceback.format_exc()
         raise Error(msg)
 
-def function_transaction(function):
-    def decorator(conn):
-        with transaction(conn):
-            function(conn)
-    return decorator
-
 def has_method(an_object, method_name):
     return hasattr(an_object, method_name) and \
                     callable(getattr(an_object, method_name))
@@ -74,7 +68,7 @@ def is_directory(path):
     return os.path.exists(path) and os.path.isdir(path)
 
 class Migration(object):
-    """ This class represents one migration version. """
+    """ This class represents a migration version. """
 
     def __init__(self, path):
         self.path = path
@@ -93,7 +87,7 @@ class Migration(object):
         missing = [m for m in ['upgrade', 'downgrade'] 
                       if not has_method(self.module, m)]
         if missing:
-            msg = 'Migration %s is missing required methods: %s' % (
+            msg = 'Migration %s is missing required methods: %s.' % (
                     self.path, ', '.join(missing))
             raise InvalidMigrationError(msg)
 
@@ -110,10 +104,6 @@ class Migration(object):
 
     def downgrade(self, conn):
         self.module.downgrade(conn)
-
-    def __cmp__(self, other):
-        # compare by version number
-        cmp(self.get_version(), other.get_version())
 
     def __repr__(self):
         return 'Migration(%s)' % self.filename
@@ -286,4 +276,3 @@ def downgrade(connection):
     # add your downgrade step here
     pass
 """
-
