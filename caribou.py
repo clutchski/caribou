@@ -162,10 +162,7 @@ class Database(object):
         sql = "SELECT version FROM %s" % VERSION_TABLE
         with execute(self.conn, sql) as cursor:
             result = cursor.fetchall()
-            version = 0
-            if result:
-                version = result[0][0]
-            return version
+            return result[0][0] if result else 0
 
     def update_version(self, version):
         sql = 'update %s set version = :1' % VERSION_TABLE
