@@ -8,3 +8,4 @@ MANIFEST
 README.html
 *.sqlite*
 *.db
+.coverage*
