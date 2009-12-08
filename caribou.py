@@ -187,12 +187,7 @@ def migration_exists(migrations, version):
     """ Return True if one the given migrations has the given version, False
         otherwise.
     """
-    version_exists = False
-    for migration in migrations:
-        if version == migration.get_version():
-            version_exists = True
-            break
-    return version_exists
+    return version in (m.get_version() for m in migrations)
 
 def get_migrations(directory, target_version=None, reverse=False):
     """ Return the migrations contained in the given directory, sorted by
