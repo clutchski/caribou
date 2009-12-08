@@ -119,10 +119,10 @@ class Database(object):
         self.conn.close()
 
     def is_version_controlled(self):
-        sql = """SELECT *
-                   FROM sqlite_master
-                  WHERE type = 'table'
-                    AND name = :1"""
+        sql = """select *
+                   from sqlite_master
+                  where type = 'table'
+                    and name = :1"""
         with execute(self.conn, sql, [VERSION_TABLE]) as cursor:
             return bool(cursor.fetchall())
 
@@ -170,7 +170,7 @@ class Database(object):
         """
         if not self.is_version_controlled():
             return None
-        sql = "SELECT version FROM %s" % VERSION_TABLE
+        sql = 'select version from %s' % VERSION_TABLE
         with execute(self.conn, sql) as cursor:
             result = cursor.fetchall()
             return result[0][0] if result else 0
@@ -181,9 +181,8 @@ class Database(object):
             self.conn.execute(sql, [version])
 
     def initialize_version_control(self):
-        sql = """
-            CREATE TABLE IF NOT EXISTS %s
-            ( version TEXT )""" % VERSION_TABLE
+        sql = """ create table if not exists %s
+                  ( version text ) """ % VERSION_TABLE
         with transaction(self.conn):
             self.conn.execute(sql)
             self.conn.execute('insert into %s values (0)' % VERSION_TABLE)
