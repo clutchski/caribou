@@ -1,9 +1,10 @@
 """
-nose unit tests for caribou migrations
+This module contains nose unit tests for the Caribou.
 """
 
 from __future__ import with_statement
 
+import contextlib
 import glob
 import os
 import shutil
@@ -20,6 +21,31 @@ INVALID_NAMES = os.path.join(INVALID_MIGRATIONS, 'names')
 
 def get_this_dir():
     return os.path.abspath(os.path.dirname(__file__))
+
+def test_transaction_context_manager():
+    """ Assert the transaction context manager commits properly. """
+
+    with contextlib.closing(sqlite3.connect(':memory:')) as conn:
+
+        conn.execute('create table animals ( name TEXT)')
+        def _count():
+            return conn.execute('select count(*) from animals').fetchone()[0]
+
+        # assert that once a transaction is commited, its locked in
+        assert _count() == 0
+        with caribou.transaction(conn):
+            conn.execute("insert into animals values ('bear')")
+        assert _count() == 1
+        conn.rollback()
+        assert _count() == 1
+        # assert it will rollback transactions with errors
+        try:
+            with caribou.transaction(conn):
+                conn.execute("insert into animals values ('wolf')")
+                raise Exception()
+        except:
+            pass
+        assert _count() == 1
 
 class TestCaribouMigrations(object):
 
