@@ -109,12 +109,12 @@ class TestCaribouMigrations(object):
         code_dir = os.path.join(get_this_dir(), INVALID_CODE)
         # assert we can't load a directory containing invalid migrations
         try:
-            caribou.get_migrations(code_dir)
+            caribou.load_migrations(code_dir)
         except caribou.InvalidMigrationError:
             pass
         else:
             assert False, 'loaded a dir with invalid migrations'
-        # assert we can't load invalid migrations one by one
+        # assert we can't load each invalid migration
         migrations = [os.path.join(code_dir, f) for f in filenames]
         for migration in migrations:
             try:
@@ -135,7 +135,7 @@ class TestCaribouMigrations(object):
                 except caribou.Error:
                     pass
                 else:
-                    assert False, 'ran an unknown migration'
+                    assert False, 'ran an unknown migration: %s' % v
         # assert we can't run non-existant migrations
         path = '/path/to/nowhereski/whoop'
         for func, args in [ (caribou.upgrade, (db_url, path, None))
@@ -223,7 +223,7 @@ class TestCaribouMigrations(object):
             try:
                 assert os.path.exists(path)
                 # assert it is a valid migration
-                caribou.Migration(path)
+                print caribou.Migration(path)
             finally:
                 # remove compiled test migration as well
                 for path in [path, path + 'c']:

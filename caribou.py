@@ -95,6 +95,7 @@ class Migration(object):
         if len(self.filename) < UTC_LENGTH:
             raise InvalidNameError(self.filename)
         timestamp = self.filename[:UTC_LENGTH]
+        #FIXME: is this test sufficient?
         if not timestamp.isdigit():
             raise InvalidNameError(self.filename)
         return timestamp
@@ -126,30 +127,40 @@ class Database(object):
             return bool(cursor.fetchall())
 
     def upgrade(self, migrations, target_version=None):
-        current_version = self.get_version()
+        if target_version:
+            _assert_migration_exists(migrations, target_version)
+
+        migrations.sort(key=lambda x: x.get_version())
+        database_version = self.get_version()
+
         for migration in migrations:
-            if migration.get_version() <= current_version:
+            current_version = migration.get_version()
+            if current_version <= database_version:
                 continue
-            if target_version and migration.get_version() > target_version:
+            if target_version and current_version > target_version:
                 break
             migration.upgrade(self.conn)
             new_version = migration.get_version()
             self.update_version(new_version)
 
     def downgrade(self, migrations, target_version):
-        current_version = self.get_version()
+        if target_version not in (0, '0'):
+            _assert_migration_exists(migrations, target_version)
+
+        migrations.sort(key=lambda x: x.get_version(), reverse=True)
+        database_version = self.get_version()
+
         for i, migration in enumerate(migrations):
-            if migration.get_version() > current_version:
+            current_version = migration.get_version()
+            if current_version > database_version:
                 continue
-            if migration.get_version() <= target_version:
+            if current_version <= target_version:
                 break
             migration.downgrade(self.conn)
-            # set the version to the one below on the queue, or 0 if 
-            # this is the last
             next_version = 0
-            next_i = i + 1
-            if next_i < len(migrations):
-                next_migration = migrations[next_i]
+            if i < len(migrations) - 1:
+                # peek at the next migration for its version
+                next_migration = migrations[i + 1]
                 next_version = next_migration.get_version()
             self.update_version(next_version)
 
@@ -180,28 +191,21 @@ class Database(object):
     def __repr__(self):
         return 'Database("%s")' % self.db_url
 
-def migration_exists(migrations, version):
-    """ Return True if one the given migrations has the given version, False
-        otherwise.
-    """
-    return version in (m.get_version() for m in migrations)
+def _assert_migration_exists(migrations, version):
+    if version not in (m.get_version() for m in migrations):
+        raise Error('No migration with version %s exists.' % version)
 
-def get_migrations(directory, target_version=None, reverse=False):
+def load_migrations(directory):
     """ Return the migrations contained in the given directory, sorted by
-        version number. If a target version is specified, assert a migration
-        with that version number exists.
+        version number.
     """
     if not is_directory(directory):
         msg = "%s is not a directory." % directory
         raise Error(msg)
     wildcard = os.path.join(directory, '*.py')
     migration_files = glob.glob(wildcard)
-    migrations = [Migration(f) for f in migration_files]
-    if target_version and not migration_exists(migrations, target_version):
-        msg = "No migration exists with version %s." % target_version
-        raise Error(msg)
-    return sorted(migrations, key=lambda x: x.get_version(), reverse=reverse)
-    
+    return [Migration(f) for f in migration_files]
+   
 def upgrade(db_url, migration_dir, version=None):
     """ Upgrade the given database with the migrations contained in the
         migrations directory. If a version is not specified, upgrade
@@ -211,7 +215,7 @@ def upgrade(db_url, migration_dir, version=None):
         db = Database(db_url)
         if not db.is_version_controlled():
             db.initialize_version_control()
-        migrations = get_migrations(migration_dir, version)
+        migrations = load_migrations(migration_dir)
         db.upgrade(migrations, version)
 
 def downgrade(db_url, migration_dir, version):
@@ -222,8 +226,7 @@ def downgrade(db_url, migration_dir, version):
         if not db.is_version_controlled():
             msg = "The database %s is not version controlled." % (db_url)
             raise Error(msg)
-        target_version = None if version == '0' else version
-        migrations = get_migrations(migration_dir, target_version, reverse=True)
+        migrations = load_migrations(migration_dir)
         db.downgrade(migrations, version)
 
 def get_version(db_url):
