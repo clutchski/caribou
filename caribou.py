@@ -158,8 +158,9 @@ class Database(object):
                 break
             migration.downgrade(self.conn)
             next_version = 0
+            # if an earlier migration exists, set the db version to 
+            # its version number
             if i < len(migrations) - 1:
-                # peek at the next migration for its version
                 next_migration = migrations[i + 1]
                 next_version = next_migration.get_version()
             self.update_version(next_version)
@@ -227,8 +228,7 @@ def downgrade(db_url, migration_dir, version):
         db.downgrade(migrations, version)
 
 def get_version(db_url):
-    """ Return the migration version of the given database.
-    """
+    """ Return the migration version of the given database. """
     with contextlib.closing(Database(db_url)) as db:
         return db.get_version()
 
@@ -245,6 +245,7 @@ def create_migration(name, directory=None):
     version = now.strftime("%Y%m%d%H%M%S")
 
     contents = MIGRATION_TEMPLATE % {'name':name, 'version':version}
+
     name = name.replace(' ', '_')
     filename = "%s_%s.py" % (version, name)
     path = os.path.join(directory, filename)
