@@ -195,9 +195,7 @@ def _assert_migration_exists(migrations, version):
         raise Error('No migration with version %s exists.' % version)
 
 def load_migrations(directory):
-    """ Return the migrations contained in the given directory, sorted by
-        version number.
-    """
+    """ Return the migrations contained in the given directory. """
     if not is_directory(directory):
         msg = "%s is not a directory." % directory
         raise Error(msg)
