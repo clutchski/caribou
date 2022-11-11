@@ -10,3 +10,4 @@ README.html
 *.db
 .coverage*
 .eggs
+.tox
