@@ -9,3 +9,4 @@ README.html
 *.sqlite*
 *.db
 .coverage*
+.eggs
