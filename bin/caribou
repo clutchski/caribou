@@ -123,7 +123,7 @@ def main():
         # show the full trace for invalid migration errors, because they
         # are likely to include syntax errors and such
         Console.error(traceback.format_exc())
-    except caribou.Error, err:
+    except caribou.Error as err:
         # expected errors, only show the error string
         Console.error("")
         Console.error("Error: %s " % str(err))

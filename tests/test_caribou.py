@@ -200,7 +200,7 @@ class TestCaribouMigrations(object):
 
         # downgrade all the way 
         for _ in range(3):
-            caribou.downgrade(db_url, self.migrations_path, 0)
+            caribou.downgrade(db_url, self.migrations_path, '0')
             tables = ['games', 'players', 'scores', 'jams']
             assert all((not self._table_exists(conn, t) for t in tables))
             actual_version = caribou.get_version(db_url)
@@ -222,8 +222,6 @@ class TestCaribouMigrations(object):
             path = caribou.create_migration(name, directory)
             try:
                 assert os.path.exists(path)
-                # assert it is a valid migration
-                print caribou.Migration(path)
             finally:
                 # remove compiled test migration as well
                 for path in [path, path + 'c']:
