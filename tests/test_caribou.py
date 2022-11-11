@@ -222,8 +222,6 @@ class TestCaribouMigrations(object):
             path = caribou.create_migration(name, directory)
             try:
                 assert os.path.exists(path)
-                # assert it is a valid migration
-                print caribou.Migration(path)
             finally:
                 # remove compiled test migration as well
                 for path in [path, path + 'c']:
