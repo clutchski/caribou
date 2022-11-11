@@ -25,7 +25,7 @@ class Console(object):
     @staticmethod
     def error(message):
         sys.stderr.write('%s\n' % message)
-    
+
     @staticmethod
     def info(message):
         sys.stdout.write('%s\n' % message)
@@ -109,12 +109,16 @@ def main():
     upgrade_cmd.add_argument(DIR_ARG, help=DIR_HELP)
     upgrade_cmd.add_argument(VERSION_ARG,  help=VERSION_HELP)
     upgrade_cmd.set_defaults(func=downgrade_db_command)
-    # add the migration list command 
+    # add the migration list command
     list_cmd = commands.add_parser(LIST_CMD, help=LIST_CMD_HELP)
     list_cmd.add_argument(DIR_ARG, help=DIR_HELP)
     list_cmd.set_defaults(func=list_migrations_command)
 
     args = parser.parse_args()
+    if not hasattr(args, 'func'):
+        parser.print_help()
+        return 0
+
     # call the command's func
     return_code = EXIT_FAILURE
     try:
