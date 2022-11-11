@@ -200,7 +200,7 @@ class TestCaribouMigrations(object):
 
         # downgrade all the way 
         for _ in range(3):
-            caribou.downgrade(db_url, self.migrations_path, 0)
+            caribou.downgrade(db_url, self.migrations_path, '0')
             tables = ['games', 'players', 'scores', 'jams']
             assert all((not self._table_exists(conn, t) for t in tables))
             actual_version = caribou.get_version(db_url)
