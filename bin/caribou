@@ -20,21 +20,17 @@ import caribou
 EXIT_SUCCESS = 0
 EXIT_FAILURE = -1
 
-class Console(object):
+def _print_error(message):
+    sys.stderr.write('%s\n' % message)
 
-    @staticmethod
-    def error(message):
-        sys.stderr.write('%s\n' % message)
-
-    @staticmethod
-    def info(message):
-        sys.stdout.write('%s\n' % message)
+def _print_info(message):
+    sys.stdout.write('%s\n' % message)
 
 def create_migration_command(args):
     name = args.name
     directory = args.migration_dir
     path = caribou.create_migration(name, directory)
-    Console.info("created migration %s" % path)
+    _print_info("created migration %s" % path)
 
 def print_version_command(args):
     db_path =  args.database_path
@@ -42,7 +38,7 @@ def print_version_command(args):
     msg = 'the db [%s] is not under version control' % db_path
     if version:
         msg = 'the db [%s] is at version %s' % (db_path, version)
-    Console.info(msg)
+    _print_info(msg)
 
 def upgrade_db_command(args):
     db_path = args.database_path
@@ -51,37 +47,37 @@ def upgrade_db_command(args):
     msg = 'upgrading db [%s] to most recent version' % db_path
     if version:
         msg = 'upgrading db [%s] to version [%s]' % (db_path, version)
-    Console.info(msg)
+    _print_info(msg)
     caribou.upgrade(db_path, migration_dir, version)
     new_version = caribou.get_version(db_path)
     if version:
         assert new_version == version
     msg = "upgraded [%s] successfully to version [%s]" % (
                                     db_path, new_version)
-    Console.info(msg)
+    _print_info(msg)
 
 def downgrade_db_command(args):
     db_path = args.database_path
     migration_dir = args.migration_dir
     version = args.version
     msg = 'downgrading db [%s] to version [%s]' % (db_path, version)
-    Console.info(msg)
+    _print_info(msg)
     caribou.downgrade(db_path, migration_dir, version)
     msg = "downgraded [%s] successfully to version [%s]" % (
                                 db_path, version)
-    Console.info(msg)
+    _print_info(msg)
 
 def list_migrations_command(args):
     migration_dir = args.migration_dir
-    Console.info("Migrations in [%s]:" % migration_dir)
-    Console.info("")
+    _print_info("Migrations in [%s]:" % migration_dir)
+    _print_info("")
     migrations = caribou.get_migrations(migration_dir)
     for migration in migrations:
         version = migration.get_version()
         path = migration.path
         name = migration.name
         line = "%s\t%s\t%s" % (version, name, path)
-        Console.info(line)
+        _print_info(line)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -126,14 +122,14 @@ def main():
     except caribou.InvalidMigrationError:
         # show the full trace for invalid migration errors, because they
         # are likely to include syntax errors and such
-        Console.error(traceback.format_exc())
+        _print_error(traceback.format_exc())
     except caribou.Error as err:
         # expected errors, only show the error string
-        Console.error("")
-        Console.error("Error: %s " % str(err))
+        _print_error("")
+        _print_error("Error: %s " % str(err))
     except Exception:
-        Console.error("an unexpected error occured:")
-        Console.error(traceback.format_exc())
+        _print_error("an unexpected error occured:")
+        _print_error(traceback.format_exc())
     else:
         return_code = EXIT_SUCCESS
     finally:
