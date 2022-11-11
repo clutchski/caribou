@@ -11,7 +11,7 @@ side databases over multiple releases of an application.
 
   [rails]:http://guides.rubyonrails.org/migrations.html 
   [python]: http://python.org/
-  [sqlite]: http://sqlite.ord
+  [sqlite]: https://sqlite.org/
 
 Example
 -------
@@ -74,7 +74,7 @@ Caribou migrations can be run with the command line tool:
     downgrading db [my_sqlite_db] to version [0]
     downgraded [my_sqlite_db] successfully to version [0]
 
-Since Caribou is built to manage client side sqlite databases, it can also be
+Since Caribou is built to manage client side SQLite databases, it can also be
 run programmatically from within your application:
 
     """
@@ -136,7 +136,7 @@ or simply:
 
     nosetests
 
-[nose]:http://somethingaboutorange.com/mrl/projects/nose/0.11.1/
+[nose]:http://nose.readthedocs.io/en/latest/
 
 Appendix
 --------
