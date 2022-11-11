@@ -101,14 +101,14 @@ That's it. You're rolling.
 Installation
 ------------
 
-using setuptools:
+using pip:
 
-    sudo easy_install caribou
+    pip caribou
 
 or, [download][download] and extract the most code in the repo, and
 run:
 
-    sudo python setup.py install
+     python setup.py install
 
 [download]:http://github.com/clutchski/caribou/archives/master
 
@@ -126,7 +126,7 @@ Things to know, before you start hacking Caribou:
 
 The unit test suite requires the [nose][nose] unit testing library. To install:
 
-    sudo easy_install nose
+    easy_install nose
 
 To execute the test suite, run:
 
