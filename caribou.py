@@ -257,7 +257,7 @@ MIGRATION_TEMPLATE = """\
 \"\"\"
 This module contains a Caribou migration.
 
-Migration Name: %(name)s 
+Migration Name: %(name)s
 Migration Version: %(version)s
 \"\"\"
 
