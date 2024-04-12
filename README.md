@@ -103,7 +103,7 @@ Installation
 
 using pip:
 
-    pip caribou
+    pip install caribou
 
 or, [download][download] and extract the most code in the repo, and
 run:
