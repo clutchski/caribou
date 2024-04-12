@@ -4,10 +4,6 @@ to manage the evoluton of client side databases over multiple releases
 of an application.
 """
 
-from __future__ import with_statement
-
-__author__ = 'clutchski@gmail.com'
-
 import contextlib
 import datetime
 import glob
