@@ -7,10 +7,10 @@ of an application.
 import contextlib
 import datetime
 import glob
-import imp
 import os.path
 import sqlite3
 import traceback
+from importlib.machinery import SourceFileLoader
 
 # statics
 
@@ -75,8 +75,9 @@ class Migration(object):
         while self.name.startswith('_'):
             self.name = self.name[1:]
         try:
-            self.module = imp.load_source(self.module_name, path)
-        except:
+            sfl = SourceFileLoader(self.module_name, path)
+            self.module = sfl.load_module()
+        except Exception:
             msg = "Invalid migration %s: %s" % (path, traceback.format_exc())
             raise InvalidMigrationError(msg)
         # assert the migration has the needed methods
