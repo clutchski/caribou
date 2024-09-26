@@ -124,19 +124,10 @@ Things to know, before you start hacking Caribou:
 
 #### Unit Tests
 
-The unit test suite requires the [nose][nose] unit testing library. To install:
+The unit test suite uses pytest and tox. To install and run:
 
-    easy_install nose
-
-To execute the test suite, run:
-
-    python setup.py nosetests
-
-or simply:
-
-    nosetests
-
-[nose]:http://nose.readthedocs.io/en/latest/
+    pip install tox pytest
+    tox
 
 Appendix
 --------
