@@ -1,0 +1,15 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "caribou"
+authors = [{name = "Matt Perpick", email = "clutchski@gmail.com"}]
+readme = "README.md"
+dynamic = ["version", "description"]
+
+[project.urls]
+Home = "https://github.com/clutchski/caribou"
+
+[project.scripts]
+caribou = "cli:main"

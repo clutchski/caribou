@@ -1,6 +1,0 @@
-#!/bin/bash
-#
-# a shortcut to running the command line program for
-# dev purposes only
-
-PYTHONPATH=.:$PYTHONPATH bin/caribou $*
