@@ -237,3 +237,4 @@ def test_create_migration():
     else:
         assert False
 
+
