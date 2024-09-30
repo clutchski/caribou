@@ -21,3 +21,5 @@ test_cli:
 .PHONY: all
 all:	clean test_cli test 
 
+publish:
+	flit publish
