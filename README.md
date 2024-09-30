@@ -101,16 +101,7 @@ That's it. You're rolling.
 Installation
 ------------
 
-using pip:
-
     pip install caribou
-
-or, [download][download] and extract the most code in the repo, and
-run:
-
-     python setup.py install
-
-[download]:http://github.com/clutchski/caribou/archives/master
 
 Licence
 --------
