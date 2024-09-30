@@ -12,4 +12,4 @@ dynamic = ["version", "description"]
 Home = "https://github.com/clutchski/caribou"
 
 [project.scripts]
-caribou = "cli:main"
+caribou = "caribou.cli:main"
