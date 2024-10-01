@@ -9,6 +9,8 @@ m=test_cli_migration_marker
 
 mkdir -p $d
 
+export PYTHONPATH=$PYTHONPATH:caribou
+
 cli="python caribou/cli.py"
 
 $cli -h
@@ -28,5 +30,5 @@ rm -f "*$m*"
 
 
 echo "==========================="
-echo "cli tests passed"
+echo " cli tests passed"
 echo "==========================="
