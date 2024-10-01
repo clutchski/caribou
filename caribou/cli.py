@@ -27,6 +27,7 @@ def _print_error(message):
 def _print_info(message):
     sys.stdout.write("%s\n" % message)
 
+
 def info_command(args):
     _print_info("Caribou version: %s" % caribou.__version__)
 
