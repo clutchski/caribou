@@ -27,6 +27,9 @@ def _print_error(message):
 def _print_info(message):
     sys.stdout.write("%s\n" % message)
 
+def info_command(args):
+    _print_info("Caribou version: %s" % caribou.__version__)
+
 
 def create_migration_command(args):
     name = args.name
@@ -114,6 +117,8 @@ def main():
     list_cmd = commands.add_parser(LIST_CMD, help=LIST_CMD_HELP)
     list_cmd.add_argument(DIR_ARG, help=DIR_HELP)
     list_cmd.set_defaults(func=list_migrations_command)
+    meta_cmd = commands.add_parser("info")
+    meta_cmd.set_defaults(func=info_command)
 
     args = parser.parse_args()
     if not hasattr(args, "func"):
