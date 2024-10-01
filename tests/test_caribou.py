@@ -1,11 +1,8 @@
-from __future__ import with_statement
-
 import contextlib
 import glob
 import os
 import shutil
 import sqlite3
-import traceback
 import pytest
 
 import caribou
@@ -47,8 +44,10 @@ def test_transaction_context_manager():
             with caribou.transaction(conn):
                 conn.execute("insert into animals values ('wolf')")
                 raise Exception()
-        except:
+        except Exception:
             pass
+        else:
+            assert 0  # should fail
         assert _count() == 1
 
 
@@ -100,7 +99,7 @@ def test_valid_migration_filenames():
         path = os.path.join(migrations_path, version + suffix)
         migration = caribou.Migration(path)
         actual_version = migration.get_version()
-        assert actual_version == version, "%s != %s" % (actual_version, version)
+        assert actual_version == version
 
 
 def test_invalid_migraton_code(sqlite_test_path):
@@ -162,7 +161,7 @@ def test_migration(sqlite_test_path):
     conn = sqlite3.connect(db_url)
     assert not _table_exists(conn, "games")
     assert not _table_exists(conn, "players")
-    assert caribou.get_version(db_url) == None
+    assert caribou.get_version(db_url) is None
 
     # assert that the first migration has been run successfully
     # and that subsequent runs have no effect

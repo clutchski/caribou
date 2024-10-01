@@ -2,7 +2,7 @@
 a migration with a syntax error
 """
 
-import caribou
+# flake8: noqa
 
 import me_no_existy
 

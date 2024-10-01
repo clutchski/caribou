@@ -55,14 +55,13 @@ def transaction(conn):
     try:
         yield
         conn.commit()
-    except:
+    except Exception:
         conn.rollback()
-        msg = "Error in transaction: %s" % traceback.format_exc()
-        raise Error(msg)
+        raise
 
 
-def has_method(an_object, method_name):
-    return hasattr(an_object, method_name) and callable(getattr(an_object, method_name))
+def has_method(an_object, name):
+    return callable(getattr(an_object, name, None))
 
 
 def is_directory(path):
@@ -87,9 +86,8 @@ class Migration(object):
             msg = "Invalid migration %s: %s" % (path, traceback.format_exc())
             raise InvalidMigrationError(msg)
         # assert the migration has the needed methods
-        missing = [
-            m for m in ["upgrade", "downgrade"] if not has_method(self.module, m)
-        ]
+        targets = ["upgrade", "downgrade"]
+        missing = [m for m in targets if not has_method(self.module, m)]
         if missing:
             msg = "Migration %s is missing required methods: %s." % (
                 self.path,

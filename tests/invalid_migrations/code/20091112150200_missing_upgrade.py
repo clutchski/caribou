@@ -1,8 +1,6 @@
 """
-migration with a missing download step
+migration with a missing upgrade step.
 """
-
-import caribou
 
 
 def downgrade(connection):

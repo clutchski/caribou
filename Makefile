@@ -8,8 +8,9 @@ test:
 clean:
 	rm -rf build dist __pycache__
 
-lint:
-	flake8 caribou
+flake8:
+	flake8 caribou tests
+lint: flake8
 
 build:
 	flit build
@@ -20,7 +21,7 @@ install:
 publish:
 	flit publish
 
-black:
+fmt:
 	black caribou tests
 
-all:	clean test lint
+all:	clean test fmt lint

@@ -5,7 +5,6 @@ database migrations library
 """
 
 # stdlib
-import os
 import sys
 import traceback
 

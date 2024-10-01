@@ -1,8 +1,6 @@
 """
-initial migration
+migration with a missing downgrade
 """
-
-import caribou
 
 
 def upgrade(connection):
