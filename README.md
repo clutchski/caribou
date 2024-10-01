@@ -90,18 +90,18 @@ An example illustrating how to run a migration programmatically.
 
 import caribou
 
-db_path = 'my_sqlite_db'
-migrations_path = '/path/to/migrations/dir'
+db = 'db.sqlite'
+migrations_dir = '/path/to/migrations/dir'
 version = '20091115140758'
 
 # upgrade to most recent version
-caribou.upgrade(db_path, migrations_path)
+caribou.upgrade(db, migrations_dir)
 
 # upgrade to a specific version
-caribou.upgrade(db_path, migrations_path, version)
+caribou.upgrade(db, migrations_dir, version)
 
 # downgrade to a specific version
-caribou.downgrade(db_path, migrations_path, version)
+caribou.downgrade(db, migrations_dir, version)
 ```
 
 That's it. You're rolling.
