@@ -1,10 +1,23 @@
 
+.PHONY: *
+
+check:	clean fmtcheck lint test
+
+deps:
+	# install build dependences
+	pip install tox flake8 black
+
 test:
 	tox
+	./tests/test_cli.sh
 
-.PHONY: clean
 clean:
 	rm -rf build dist __pycache__
+
+flake8:
+	flake8 caribou tests
+
+lint: flake8
 
 build:
 	flit build
@@ -12,14 +25,11 @@ build:
 install:
 	flit install
 
-.PHONY: test_shell
-test_cli:
-	flit install --symlink
-	./tests/test_cli.sh
-
-
-.PHONY: all
-all:	clean test_cli test 
-
-publish:
+publish: check
 	flit publish
+
+fmt:
+	black caribou tests
+
+fmtcheck:
+	black --check caribou tests

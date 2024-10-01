@@ -9,17 +9,19 @@ m=test_cli_migration_marker
 
 mkdir -p $d
 
-caribou -h
-caribou version $db
+cli=caribou/cli.py
 
-caribou create -d $d $m
-caribou upgrade $db $d
-caribou version $db
-caribou downgrade $db $d 0
-caribou version $db
-caribou upgrade $db $d
-caribou version $db
-caribou list $d
+$cli -h
+$cli version $db
+
+$cli create -d $d $m
+$cli upgrade $db $d
+$cli version $db
+$cli downgrade $db $d 0
+$cli version $db
+$cli upgrade $db $d
+$cli version $db
+$cli list $d
 
 rm -rf $d $db
 rm -f "*$m*"
