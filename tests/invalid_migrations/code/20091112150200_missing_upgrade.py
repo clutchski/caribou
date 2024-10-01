@@ -7,4 +7,3 @@ import caribou
 
 def downgrade(connection):
     pass
-

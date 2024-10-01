@@ -20,4 +20,7 @@ install:
 publish:
 	flit publish
 
+black:
+	black caribou tests
+
 all:	clean test lint

@@ -2,6 +2,7 @@
 initial migration
 """
 
+
 def upgrade(connection):
     sql = """
         CREATE TABLE games
@@ -17,7 +18,7 @@ def upgrade(connection):
         )"""
     connection.execute(sql)
 
-def downgrade(connection):
-    for table in ['games', 'players']:
-        connection.execute("drop table %s" % table)
 
+def downgrade(connection):
+    for table in ["games", "players"]:
+        connection.execute("drop table %s" % table)

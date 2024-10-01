@@ -2,6 +2,7 @@
 a third migration
 """
 
+
 def upgrade(connection):
     sql = """
         create table jams
@@ -10,6 +11,6 @@ def upgrade(connection):
         )"""
     connection.execute(sql)
 
-def downgrade(connection):
-    connection.execute('drop table jams')
 
+def downgrade(connection):
+    connection.execute("drop table jams")

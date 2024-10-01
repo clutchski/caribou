@@ -4,6 +4,7 @@ initial migration
 
 import caribou
 
+
 def upgrade(connection):
     sql = """
         CREATE TABLE scores
@@ -12,7 +13,6 @@ def upgrade(connection):
         )"""
     connection.execute(sql)
 
+
 def downgrade(connection):
     connection.execute("drop table scores")
-
-
