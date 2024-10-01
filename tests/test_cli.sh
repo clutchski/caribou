@@ -9,7 +9,7 @@ m=test_cli_migration_marker
 
 mkdir -p $d
 
-cli=caribou/cli.py
+cli="python caribou/cli.py"
 
 $cli -h
 $cli version $db
@@ -27,4 +27,6 @@ rm -rf $d $db
 rm -f "*$m*"
 
 
-echo "cli commands didn't fail"
+echo "==========================="
+echo "cli tests passed"
+echo "==========================="
