@@ -33,3 +33,10 @@ fmt:
 
 fmtcheck:
 	black --check caribou tests
+
+
+#
+# tag
+# git tag 0.4.1
+# git push --tags
+# 
