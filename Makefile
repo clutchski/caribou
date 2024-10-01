@@ -1,14 +1,23 @@
 
 .PHONY: *
 
-check:	clean fmtcheck lint test
+# test against all versions of python
+check:	clean fmtcheck lint test tox
+
+
+# Run all automated tests for one version of python
+ci: clean fmtcheck lint test
+
 
 deps:
 	# install build dependences
 	pip install tox flake8 black
 
-test:
+tox:
 	tox
+
+test:
+	pytest
 	./tests/test_cli.sh
 
 clean:
