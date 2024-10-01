@@ -1,6 +1,10 @@
 
 .PHONY: *
 
+deps:
+	# install build dependences
+	pip install tox flake8 black
+
 test:
 	tox
 	./tests/test_cli.sh
