@@ -1,6 +1,8 @@
 
 .PHONY: *
 
+check:	clean fmtcheck lint test
+
 deps:
 	# install build dependences
 	pip install tox flake8 black
@@ -14,6 +16,7 @@ clean:
 
 flake8:
 	flake8 caribou tests
+
 lint: flake8
 
 build:
@@ -22,10 +25,11 @@ build:
 install:
 	flit install
 
-publish:
+publish: check
 	flit publish
 
 fmt:
 	black caribou tests
 
-all:	clean test fmt lint
+fmtcheck:
+	black --check caribou tests
