@@ -41,7 +41,7 @@ fmt:
 	black caribou tests
 
 fmtcheck:
-	black --check caribou tests
+	python -m black --check caribou tests
 
 
 #
