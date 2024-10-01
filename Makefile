@@ -11,13 +11,13 @@ ci: clean fmtcheck lint test
 
 deps:
 	# install build dependences
-	pip install tox flake8 black
+	python -m pip install tox flake8 black
 
 tox:
 	tox
 
 test:
-	pytest
+	python -m pytest
 	./tests/test_cli.sh
 
 clean:
