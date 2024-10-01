@@ -69,15 +69,15 @@ to add logging, DDL transactions, anything at all.
 Caribou migrations can be run with the command line tool:
 
 ```
-$ caribou upgrade my_sqlite_db .
-upgrading db [my_sqlite_db] to most recent version
-upgraded [my_sqlite_db] successfully to version [20091115140758]
+$ caribou upgrade db.sqlite .
+upgrading db [db.sqlite] to most recent version
+upgraded [db.sqlite] successfully to version [20091115140758]
 
 # if you want to revert your changes, uses the downgrade command:
 
-$ caribou downgrade my_sqlite_db . 0
-downgrading db [my_sqlite_db] to version [0]
-downgraded [my_sqlite_db] successfully to version [0]
+$ caribou downgrade db.sqlite . 0
+downgrading db [db.sqlite] to version [0]
+downgraded [db.sqlite] successfully to version [0]
 ```
 
 Since Caribou is built to manage client side SQLite databases, it can also be
