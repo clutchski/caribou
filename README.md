@@ -6,7 +6,7 @@ Caribou SQLite Migrations
 </div>
 
 Caribou is a small, simple [SQLite][sqlite] database [migrations][rails]
-library for [Python][python], built primarily to manage the evoluton of client
+library for [Python][python], built primarily to manage the evolution of client
 side databases over multiple releases of an application.
 
   [rails]:http://guides.rubyonrails.org/migrations.html
@@ -73,7 +73,7 @@ $ caribou upgrade db.sqlite .
 upgrading db [db.sqlite] to most recent version
 upgraded [db.sqlite] successfully to version [20091115140758]
 
-# if you want to revert your changes, uses the downgrade command:
+# if you want to revert your changes, use the downgrade command:
 
 $ caribou downgrade db.sqlite . 0
 downgrading db [db.sqlite] to version [0]
