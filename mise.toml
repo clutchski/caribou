@@ -1,0 +1,12 @@
+[settings]
+experimental = true
+
+[tools]
+uv = "0.10"
+python = ["3.14", "3.13", "3.12", "3.11", "3.10"]
+
+[env]
+_.python.venv = { path = ".venv", create = true, uv_create_args = ["--seed"] }
+
+[hooks.postinstall]
+run = "make deps"

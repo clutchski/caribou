@@ -21,30 +21,30 @@ EXIT_FAILURE = -1
 
 
 def _print_error(message):
-    sys.stderr.write("%s\n" % message)
+    sys.stderr.write(f"{message}\n")
 
 
 def _print_info(message):
-    sys.stdout.write("%s\n" % message)
+    sys.stdout.write(f"{message}\n")
 
 
 def info_command(args):
-    _print_info("Caribou version: %s" % caribou.__version__)
+    _print_info(f"Caribou version: {caribou.__version__}")
 
 
 def create_migration_command(args):
     name = args.name
     directory = args.migration_dir
     path = caribou.create_migration(name, directory)
-    _print_info("created migration %s" % path)
+    _print_info(f"created migration {path}")
 
 
 def print_version_command(args):
     db_path = args.database_path
     version = caribou.get_version(db_path)
-    msg = "the db [%s] is not under version control" % db_path
+    msg = f"the db [{db_path}] is not under version control"
     if version:
-        msg = "the db [%s] is at version %s" % (db_path, version)
+        msg = f"the db [{db_path}] is at version {version}"
     _print_info(msg)
 
 
@@ -52,15 +52,15 @@ def upgrade_db_command(args):
     db_path = args.database_path
     migration_dir = args.migration_dir
     version = args.version
-    msg = "upgrading db [%s] to most recent version" % db_path
+    msg = f"upgrading db [{db_path}] to most recent version"
     if version:
-        msg = "upgrading db [%s] to version [%s]" % (db_path, version)
+        msg = f"upgrading db [{db_path}] to version [{version}]"
     _print_info(msg)
     caribou.upgrade(db_path, migration_dir, version)
     new_version = caribou.get_version(db_path)
     if version:
         assert new_version == version
-    msg = "upgraded [%s] successfully to version [%s]" % (db_path, new_version)
+    msg = f"upgraded [{db_path}] successfully to version [{new_version}]"
     _print_info(msg)
 
 
@@ -68,24 +68,21 @@ def downgrade_db_command(args):
     db_path = args.database_path
     migration_dir = args.migration_dir
     version = args.version
-    msg = "downgrading db [%s] to version [%s]" % (db_path, version)
-    _print_info(msg)
+    _print_info(f"downgrading db [{db_path}] to version [{version}]")
     caribou.downgrade(db_path, migration_dir, version)
-    msg = "downgraded [%s] successfully to version [%s]" % (db_path, version)
-    _print_info(msg)
+    _print_info(f"downgraded [{db_path}] successfully to version [{version}]")
 
 
 def list_migrations_command(args):
     migration_dir = args.migration_dir
-    _print_info("Migrations in [%s]:" % migration_dir)
+    _print_info(f"Migrations in [{migration_dir}]:")
     _print_info("")
     migrations = caribou.load_migrations(migration_dir)
     for migration in migrations:
         version = migration.get_version()
         path = migration.path
         name = migration.name
-        line = "%s\t%s\t%s" % (version, name, path)
-        _print_info(line)
+        _print_info(f"{version}\t{name}\t{path}")
 
 
 def main():
@@ -137,14 +134,13 @@ def main():
     except caribou.Error as err:
         # expected errors, only show the error string
         _print_error("")
-        _print_error("Error: %s " % str(err))
+        _print_error(f"Error: {err} ")
     except Exception:
         _print_error("an unexpected error occured:")
         _print_error(traceback.format_exc())
     else:
         return_code = EXIT_SUCCESS
-    finally:
-        return return_code
+    return return_code
 
 
 # options/arguments

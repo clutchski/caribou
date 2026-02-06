@@ -10,8 +10,7 @@ ci: clean fmtcheck lint test
 
 
 deps:
-	# install build dependences
-	python -m pip install tox flake8 black pytest
+	uv sync
 
 tox:
 	tox
