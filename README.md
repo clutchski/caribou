@@ -124,8 +124,8 @@ caribou.downgrade("my.db", modules, "0")
 ```
 
 Migration files use a `v`-prefix naming convention (`v20240101120000_name.py`) that
-is both importable as a Python module and sortable by version. The old naming
-convention (`20240101120000_name.py`) continues to work for directory-based discovery.
+is both importable as a Python module and sortable by version. The naming
+convention in versions 0.5 and below (`20240101120000_name.py`) continues to work for directory-based discovery.
 
 To convert existing migrations to the new convention, simply add a `v` prefix to the
 filename (e.g. rename `20240101120000_name.py` to `v20240101120000_name.py`).
