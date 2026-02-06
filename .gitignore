@@ -11,3 +11,5 @@ README.html
 .coverage*
 .eggs
 .tox
+.claude/*local.json
+
