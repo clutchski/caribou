@@ -171,8 +171,7 @@ VERSION_CMD_HELP = "return the migration version of the database"
 
 UP_CMD = "upgrade"
 UP_CMD_HELP = (
-    "upgrade the db. if a version isn't specified, "
-    "upgrade to the most recent version."
+    "upgrade the db. if a version isn't specified, upgrade to the most recent version."
 )
 
 DOWN_CMD = "downgrade"

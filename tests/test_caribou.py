@@ -26,7 +26,6 @@ def test_transaction_context_manager():
     """Assert the transaction context manager commits properly."""
 
     with contextlib.closing(sqlite3.connect(":memory:")) as conn:
-
         conn.execute("create table animals ( name TEXT)")
 
         def _count():

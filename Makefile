@@ -22,10 +22,8 @@ test:
 clean:
 	rm -rf build dist __pycache__
 
-flake8:
-	flake8 caribou tests
-
-lint: flake8
+lint:
+	ruff check caribou tests
 
 build:
 	flit build
@@ -37,10 +35,11 @@ publish: check
 	flit publish
 
 fmt:
-	black caribou tests
+	ruff format caribou tests
+	ruff check --fix caribou tests
 
 fmtcheck:
-	python -m black --check caribou tests
+	ruff format --check caribou tests
 
 
 #
