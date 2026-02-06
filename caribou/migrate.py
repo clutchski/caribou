@@ -116,7 +116,6 @@ class Migration:
 
 
 class Database:
-
     def __init__(self, db_url):
         self.db_url = db_url
         self.conn = sqlite3.connect(db_url)

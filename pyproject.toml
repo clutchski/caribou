@@ -29,4 +29,11 @@ Home = "https://github.com/clutchski/caribou"
 caribou = "caribou.cli:main"
 
 [dependency-groups]
-dev = ["pytest==9.0.2", "tox==4.34.1", "flake8==7.3.0", "black==26.1.0"]
+dev = ["pytest==9.0.2", "tox==4.34.1", "ruff>=0.11"]
+
+[tool.ruff]
+line-length = 88
+exclude = [".git", ".venv", ".tox"]
+
+[tool.ruff.lint.per-file-ignores]
+"caribou/__init__.py" = ["F401"]
