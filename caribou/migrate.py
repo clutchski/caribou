@@ -4,7 +4,7 @@ import glob
 import os.path
 import sqlite3
 import traceback
-from importlib.machinery import SourceFileLoader
+import importlib.util
 
 # statics
 
@@ -32,9 +32,9 @@ class InvalidNameError(Error):
     def __init__(self, filename):
         msg = (
             "Migration filenames must start with a UTC timestamp. "
-            "The following file has an invalid name: %s" % filename
+            f"The following file has an invalid name: {filename}"
         )
-        super(InvalidNameError, self).__init__(msg)
+        super().__init__(msg)
 
 
 # code
@@ -68,7 +68,7 @@ def is_directory(path):
     return os.path.exists(path) and os.path.isdir(path)
 
 
-class Migration(object):
+class Migration:
     """This class represents a migration version."""
 
     def __init__(self, path):
@@ -80,18 +80,19 @@ class Migration(object):
         while self.name.startswith("_"):
             self.name = self.name[1:]
         try:
-            sfl = SourceFileLoader(self.module_name, path)
-            self.module = sfl.load_module()
+            spec = importlib.util.spec_from_file_location(self.module_name, path)
+            self.module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(self.module)
         except Exception:
-            msg = "Invalid migration %s: %s" % (path, traceback.format_exc())
+            msg = f"Invalid migration {path}: {traceback.format_exc()}"
             raise InvalidMigrationError(msg)
         # assert the migration has the needed methods
         targets = ["upgrade", "downgrade"]
         missing = [m for m in targets if not has_method(self.module, m)]
         if missing:
-            msg = "Migration %s is missing required methods: %s." % (
-                self.path,
-                ", ".join(missing),
+            msg = (
+                f"Migration {self.path} is missing required"
+                f" methods: {', '.join(missing)}."
             )
             raise InvalidMigrationError(msg)
 
@@ -111,10 +112,10 @@ class Migration(object):
         self.module.downgrade(conn)
 
     def __repr__(self):
-        return "Migration(%s)" % self.filename
+        return f"Migration({self.filename})"
 
 
-class Database(object):
+class Database:
 
     def __init__(self, db_url):
         self.db_url = db_url
@@ -127,7 +128,7 @@ class Database(object):
         sql = """select *
                    from sqlite_master
                   where type = 'table'
-                    and name = :1"""
+                    and name = ?"""
         with execute(self.conn, sql, [VERSION_TABLE]) as cursor:
             return bool(cursor.fetchall())
 
@@ -176,40 +177,36 @@ class Database(object):
         """
         if not self.is_version_controlled():
             return None
-        sql = "select version from %s" % VERSION_TABLE
+        sql = f"select version from {VERSION_TABLE}"
         with execute(self.conn, sql) as cursor:
             result = cursor.fetchall()
             return result[0][0] if result else 0
 
     def update_version(self, version):
-        sql = "update %s set version = :1" % VERSION_TABLE
+        sql = f"update {VERSION_TABLE} set version = ?"
         with transaction(self.conn):
             self.conn.execute(sql, [version])
 
     def initialize_version_control(self):
-        sql = (
-            """ create table if not exists %s
+        sql = f""" create table if not exists {VERSION_TABLE}
                   ( version text ) """
-            % VERSION_TABLE
-        )
         with transaction(self.conn):
             self.conn.execute(sql)
-            self.conn.execute("insert into %s values (0)" % VERSION_TABLE)
+            self.conn.execute(f"insert into {VERSION_TABLE} values (0)")
 
     def __repr__(self):
-        return 'Database("%s")' % self.db_url
+        return f'Database("{self.db_url}")'
 
 
 def _assert_migration_exists(migrations, version):
     if version not in (m.get_version() for m in migrations):
-        raise Error("No migration with version %s exists." % version)
+        raise Error(f"No migration with version {version} exists.")
 
 
 def load_migrations(directory):
     """Return the migrations contained in the given directory."""
     if not is_directory(directory):
-        msg = "%s is not a directory." % directory
-        raise Error(msg)
+        raise Error(f"{directory} is not a directory.")
     wildcard = os.path.join(directory, "*.py")
     migration_files = glob.glob(wildcard)
     return [Migration(f) for f in migration_files]
@@ -234,8 +231,7 @@ def downgrade(db_url, migration_dir, version):
     """
     with contextlib.closing(Database(db_url)) as db:
         if not db.is_version_controlled():
-            msg = "The database %s is not version controlled." % (db_url)
-            raise Error(msg)
+            raise Error(f"The database {db_url} is not version controlled.")
         migrations = load_migrations(migration_dir)
         db.downgrade(migrations, version)
 
@@ -252,8 +248,7 @@ def create_migration(name, directory=None):
     """
     directory = directory if directory else "."
     if not is_directory(directory):
-        msg = "%s is not a directory." % directory
-        raise Error(msg)
+        raise Error(f"{directory} is not a directory.")
 
     now = datetime.datetime.now()
     version = now.strftime("%Y%m%d%H%M%S")
@@ -261,7 +256,7 @@ def create_migration(name, directory=None):
     contents = MIGRATION_TEMPLATE % {"name": name, "version": version}
 
     name = name.replace(" ", "_")
-    filename = "%s_%s.py" % (version, name)
+    filename = f"{version}_{name}.py"
     path = os.path.join(directory, filename)
     with open(path, "w") as migration_file:
         migration_file.write(contents)

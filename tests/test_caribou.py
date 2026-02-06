@@ -65,7 +65,7 @@ def _table_exists(conn, table_name):
         SELECT *
           FROM sqlite_master
          WHERE type = 'table'
-           AND name = :1
+           AND name = ?
            """
     with caribou.execute(conn, sql, [table_name]) as cursor:
         return bool(cursor.fetchall())

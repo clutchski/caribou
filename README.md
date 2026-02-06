@@ -51,7 +51,7 @@ def upgrade(connection):
               , ('bengal tiger', 'threatened')
               , ('eastern elk', 'extinct')
               ]
-    sql = 'insert into animals values (:1, :2)'
+    sql = 'insert into animals values (?, ?)'
     for name, status in animals:
         connection.execute(sql, [name, status])
 
@@ -125,7 +125,7 @@ Things to know, before you start hacking Caribou:
 
 The unit test suite uses pytest and tox. To install and run:
 
-    pip install tox pytest
+    uv sync
     tox
 
 Appendix
