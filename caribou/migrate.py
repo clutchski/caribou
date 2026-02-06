@@ -9,6 +9,7 @@ import importlib.util
 # statics
 
 VERSION_TABLE = "migration_version"
+VERSION_PREFIX = "v"
 UTC_LENGTH = 14
 
 # errors
@@ -31,7 +32,8 @@ class InvalidNameError(Error):
 
     def __init__(self, filename):
         msg = (
-            "Migration filenames must start with a UTC timestamp. "
+            "Migration filenames must start with a UTC timestamp "
+            "or use the v-prefix convention (e.g. v20240101120000_name.py). "
             f"The following file has an invalid name: {filename}"
         )
         super().__init__(msg)
@@ -76,7 +78,10 @@ class Migration:
         self.filename = os.path.basename(path)
         self.module_name, _ = os.path.splitext(self.filename)
         self.get_version()  # will assert the filename is valid
-        self.name = self.module_name[UTC_LENGTH:]
+        if self.module_name[0] == "v" and self.module_name[1 : 1 + UTC_LENGTH].isdigit():
+            self.name = self.module_name[1 + UTC_LENGTH :]
+        else:
+            self.name = self.module_name[UTC_LENGTH:]
         while self.name.startswith("_"):
             self.name = self.name[1:]
         try:
@@ -97,13 +102,60 @@ class Migration:
             raise InvalidMigrationError(msg)
 
     def get_version(self):
-        if len(self.filename) < UTC_LENGTH:
-            raise InvalidNameError(self.filename)
-        timestamp = self.filename[:UTC_LENGTH]
-        # FIXME: is this test sufficient?
-        if not timestamp.isdigit():
-            raise InvalidNameError(self.filename)
-        return timestamp
+        if hasattr(self, "_version"):
+            return self._version
+        # Try bare digits first (20091112130101_name.py),
+        # then v-prefix (v20091112130101_name.py)
+        for offset in (0, 1):
+            if offset == 1 and not self.filename.startswith("v"):
+                continue
+            if len(self.filename) >= offset + UTC_LENGTH:
+                timestamp = self.filename[offset : offset + UTC_LENGTH]
+                if timestamp.isdigit():
+                    return timestamp
+        raise InvalidNameError(self.filename)
+
+    @classmethod
+    def from_module(cls, module):
+        """Create a Migration from an already-imported Python module."""
+        self = cls.__new__(cls)
+        self.module = module
+        self.path = None
+        self.filename = None
+        self.module_name = module.__name__
+
+        # Extract version from module name or VERSION attribute.
+        # Use the last component of dotted names (e.g. "pkg.v2024_foo" -> "v2024_foo").
+        name = self.module_name.rsplit(".", 1)[-1]
+        version = None
+        for offset in (0, 1):
+            if offset == 1 and not name.startswith("v"):
+                continue
+            if len(name) >= offset + UTC_LENGTH and name[offset : offset + UTC_LENGTH].isdigit():
+                version = name[offset : offset + UTC_LENGTH]
+                self.name = name[offset + UTC_LENGTH :]
+                break
+        if version is None and hasattr(module, "VERSION"):
+            version = str(module.VERSION)
+            self.name = name
+        if version is None:
+            raise InvalidMigrationError(
+                f"Cannot determine version for module '{name}'. "
+                "Use a v-prefix name (v20240101120000_name) or set a VERSION attribute."
+            )
+        self._version = version
+        while self.name.startswith("_"):
+            self.name = self.name[1:]
+
+        # Validate methods
+        targets = ["upgrade", "downgrade"]
+        missing = [m for m in targets if not has_method(self.module, m)]
+        if missing:
+            raise InvalidMigrationError(
+                f"Module '{self.module_name}' is missing required"
+                f" methods: {', '.join(missing)}."
+            )
+        return self
 
     def upgrade(self, conn):
         self.module.upgrade(conn)
@@ -112,7 +164,7 @@ class Migration:
         self.module.downgrade(conn)
 
     def __repr__(self):
-        return f"Migration({self.filename})"
+        return f"Migration({self.filename or self.module_name})"
 
 
 class Database:
@@ -211,27 +263,39 @@ def load_migrations(directory):
     return [Migration(f) for f in migration_files]
 
 
-def upgrade(db_url, migration_dir, version=None):
+def _migrations_from_modules(modules):
+    """Return Migration objects from a list of already-imported modules."""
+    return [Migration.from_module(m) for m in modules]
+
+
+def _load(migrations_or_dir):
+    """Load migrations from a directory path or a list of modules."""
+    if isinstance(migrations_or_dir, str):
+        return load_migrations(migrations_or_dir)
+    return _migrations_from_modules(migrations_or_dir)
+
+
+def upgrade(db_url, migrations_or_dir, version=None):
     """Upgrade the given database with the migrations contained in the
-    migrations directory. If a version is not specified, upgrade
-    to the most recent version.
+    migrations directory or module list. If a version is not specified,
+    upgrade to the most recent version.
     """
     with contextlib.closing(Database(db_url)) as db:
         db = Database(db_url)
         if not db.is_version_controlled():
             db.initialize_version_control()
-        migrations = load_migrations(migration_dir)
+        migrations = _load(migrations_or_dir)
         db.upgrade(migrations, version)
 
 
-def downgrade(db_url, migration_dir, version):
+def downgrade(db_url, migrations_or_dir, version):
     """Downgrade the database to the given version with the migrations
-    contained in the given migration directory.
+    contained in the given migration directory or module list.
     """
     with contextlib.closing(Database(db_url)) as db:
         if not db.is_version_controlled():
             raise Error(f"The database {db_url} is not version controlled.")
-        migrations = load_migrations(migration_dir)
+        migrations = _load(migrations_or_dir)
         db.downgrade(migrations, version)
 
 
@@ -255,7 +319,7 @@ def create_migration(name, directory=None):
     contents = MIGRATION_TEMPLATE % {"name": name, "version": version}
 
     name = name.replace(" ", "_")
-    filename = f"{version}_{name}.py"
+    filename = f"{VERSION_PREFIX}{version}_{name}.py"
     path = os.path.join(directory, filename)
     with open(path, "w") as migration_file:
         migration_file.write(contents)
@@ -267,7 +331,7 @@ MIGRATION_TEMPLATE = """\
 This module contains a Caribou migration.
 
 Migration Name: %(name)s
-Migration Version: %(version)s
+Migration Version: v%(version)s
 \"\"\"
 
 def upgrade(connection):
