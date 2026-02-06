@@ -25,7 +25,7 @@ Use Caribou's command line tool to create your first migration:
 
 ```bash
 $ caribou create my_first_migration
-created migration ./20091115140758_my_first_migration.py
+created migration ./v20091115140758_my_first_migration.py
 ```
 
 #### Edit Your Migration
@@ -103,6 +103,32 @@ caribou.upgrade(db, migrations_dir, version)
 # downgrade to a specific version
 caribou.downgrade(db, migrations_dir, version)
 ```
+
+#### Module-Based Migrations
+
+When bundling your app with PyInstaller, Poetry, or similar tools, filesystem-based
+migration discovery may not work. You can pass a list of already-imported migration
+modules directly to `upgrade()` and `downgrade()`:
+
+```python
+import caribou
+from myapp.migrations import v20240101120000_create_users, v20240215090000_add_scores
+
+modules = [v20240101120000_create_users, v20240215090000_add_scores]
+
+# upgrade using modules
+caribou.upgrade("my.db", modules)
+
+# downgrade using modules
+caribou.downgrade("my.db", modules, "0")
+```
+
+Migration files use a `v`-prefix naming convention (`v20240101120000_name.py`) that
+is both importable as a Python module and sortable by version. The naming
+convention in versions 0.5 and below (`20240101120000_name.py`) continues to work for directory-based discovery.
+
+To convert existing migrations to the new convention, simply add a `v` prefix to the
+filename (e.g. rename `20240101120000_name.py` to `v20240101120000_name.py`).
 
 That's it. You're rolling.
 
