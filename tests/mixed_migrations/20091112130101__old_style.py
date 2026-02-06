@@ -4,9 +4,7 @@ Old-style migration (timestamp-first filename).
 
 
 def upgrade(connection):
-    connection.execute(
-        "CREATE TABLE old_table (id NUMBER, name TEXT)"
-    )
+    connection.execute("CREATE TABLE old_table (id NUMBER, name TEXT)")
 
 
 def downgrade(connection):

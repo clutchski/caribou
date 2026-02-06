@@ -182,7 +182,9 @@ def test_migration_from_module():
 
 def test_migration_from_module_dotted_name():
     """assert from_module works with dotted module names (e.g. pkg.v2024_name)"""
-    mod = _make_migration_module("myapp.migrations.v20240101120000_create_users", _noop, _noop)
+    mod = _make_migration_module(
+        "myapp.migrations.v20240101120000_create_users", _noop, _noop
+    )
     m = caribou.Migration.from_module(mod)
     assert m.get_version() == "20240101120000"
     assert m.name == "create_users"

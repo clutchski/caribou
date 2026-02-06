@@ -78,7 +78,10 @@ def _parse_migration_name(name):
     for offset in (0, 1):
         if offset == 1 and not name.startswith("v"):
             continue
-        if len(name) >= offset + UTC_LENGTH and name[offset : offset + UTC_LENGTH].isdigit():
+        if (
+            len(name) >= offset + UTC_LENGTH
+            and name[offset : offset + UTC_LENGTH].isdigit()
+        ):
             version = name[offset : offset + UTC_LENGTH]
             parsed_name = name[offset + UTC_LENGTH :]
             while parsed_name.startswith("_"):
@@ -262,7 +265,9 @@ def load_migrations(directory):
         raise Error(f"{directory} is not a directory.")
     wildcard = os.path.join(directory, "*.py")
     migration_files = glob.glob(wildcard)
-    migration_files = [f for f in migration_files if os.path.basename(f) != "__init__.py"]
+    migration_files = [
+        f for f in migration_files if os.path.basename(f) != "__init__.py"
+    ]
     return [Migration(f) for f in migration_files]
 
 
