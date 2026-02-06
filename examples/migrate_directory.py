@@ -2,7 +2,7 @@
 Example: directory-based migrations (the traditional approach).
 
 Run from the repo root:
-    python examples/directory_migrations.py
+    python examples/migrate_directory.py
 """
 
 import os

@@ -273,7 +273,7 @@ def _migrations_from_modules(modules):
 
 def _load(migrations_or_dir):
     """Load migrations from a directory path or a list of modules."""
-    if isinstance(migrations_or_dir, str):
+    if isinstance(migrations_or_dir, (str, os.PathLike)):
         return load_migrations(migrations_or_dir)
     return _migrations_from_modules(migrations_or_dir)
 

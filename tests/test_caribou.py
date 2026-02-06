@@ -1,6 +1,7 @@
 import contextlib
 import glob
 import os
+import pathlib
 import shutil
 import sqlite3
 import types
@@ -141,6 +142,19 @@ def test_mixed_directory(sqlite_test_path):
     assert not _table_exists(conn, "old_table")
     assert not _table_exists(conn, "new_table")
     assert caribou.get_version(db_url) == "0"
+    conn.close()
+
+
+def test_upgrade_with_pathlib_path(sqlite_test_path):
+    """assert upgrade works when migration dir is a pathlib.Path"""
+    db_url = sqlite_test_path
+    mixed = pathlib.Path(get_mixed_migrations_path())
+
+    caribou.upgrade(db_url, mixed)
+
+    conn = sqlite3.connect(db_url)
+    assert _table_exists(conn, "old_table")
+    assert _table_exists(conn, "new_table")
     conn.close()
 
 

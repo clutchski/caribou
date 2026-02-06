@@ -6,7 +6,7 @@ where filesystem discovery is not available -- you just import the
 migration modules directly and pass them as a list.
 
 Run from the repo root:
-    python -m examples.module_migrations
+    python -m examples.migrate_modules
 """
 
 import os
