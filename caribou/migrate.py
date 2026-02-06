@@ -66,6 +66,27 @@ def has_method(an_object, name):
     return callable(getattr(an_object, name, None))
 
 
+def _parse_migration_name(name):
+    """Parse a version and name from a migration identifier.
+
+    Supports bare digits (20091112130101_name) and v-prefix
+    (v20091112130101_name). Strips leading underscores from
+    the name portion.
+
+    Returns (version, name) or (None, None) if no version found.
+    """
+    for offset in (0, 1):
+        if offset == 1 and not name.startswith("v"):
+            continue
+        if len(name) >= offset + UTC_LENGTH and name[offset : offset + UTC_LENGTH].isdigit():
+            version = name[offset : offset + UTC_LENGTH]
+            parsed_name = name[offset + UTC_LENGTH :]
+            while parsed_name.startswith("_"):
+                parsed_name = parsed_name[1:]
+            return version, parsed_name
+    return None, None
+
+
 def is_directory(path):
     return os.path.exists(path) and os.path.isdir(path)
 
@@ -78,12 +99,7 @@ class Migration:
         self.filename = os.path.basename(path)
         self.module_name, _ = os.path.splitext(self.filename)
         self.get_version()  # will assert the filename is valid
-        if self.module_name[0] == "v" and self.module_name[1 : 1 + UTC_LENGTH].isdigit():
-            self.name = self.module_name[1 + UTC_LENGTH :]
-        else:
-            self.name = self.module_name[UTC_LENGTH:]
-        while self.name.startswith("_"):
-            self.name = self.name[1:]
+        _, self.name = _parse_migration_name(self.module_name)
         try:
             spec = importlib.util.spec_from_file_location(self.module_name, path)
             self.module = importlib.util.module_from_spec(spec)
@@ -104,16 +120,10 @@ class Migration:
     def get_version(self):
         if hasattr(self, "_version"):
             return self._version
-        # Try bare digits first (20091112130101_name.py),
-        # then v-prefix (v20091112130101_name.py)
-        for offset in (0, 1):
-            if offset == 1 and not self.filename.startswith("v"):
-                continue
-            if len(self.filename) >= offset + UTC_LENGTH:
-                timestamp = self.filename[offset : offset + UTC_LENGTH]
-                if timestamp.isdigit():
-                    return timestamp
-        raise InvalidNameError(self.filename)
+        version, _ = _parse_migration_name(self.filename)
+        if version is None:
+            raise InvalidNameError(self.filename)
+        return version
 
     @classmethod
     def from_module(cls, module):
@@ -127,25 +137,17 @@ class Migration:
         # Extract version from module name or VERSION attribute.
         # Use the last component of dotted names (e.g. "pkg.v2024_foo" -> "v2024_foo").
         name = self.module_name.rsplit(".", 1)[-1]
-        version = None
-        for offset in (0, 1):
-            if offset == 1 and not name.startswith("v"):
-                continue
-            if len(name) >= offset + UTC_LENGTH and name[offset : offset + UTC_LENGTH].isdigit():
-                version = name[offset : offset + UTC_LENGTH]
-                self.name = name[offset + UTC_LENGTH :]
-                break
+        version, parsed_name = _parse_migration_name(name)
         if version is None and hasattr(module, "VERSION"):
             version = str(module.VERSION)
-            self.name = name
+            parsed_name = name
         if version is None:
             raise InvalidMigrationError(
                 f"Cannot determine version for module '{name}'. "
                 "Use a v-prefix name (v20240101120000_name) or set a VERSION attribute."
             )
         self._version = version
-        while self.name.startswith("_"):
-            self.name = self.name[1:]
+        self.name = parsed_name
 
         # Validate methods
         targets = ["upgrade", "downgrade"]

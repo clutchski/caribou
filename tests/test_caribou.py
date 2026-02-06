@@ -7,6 +7,7 @@ import types
 import pytest
 
 import caribou
+from caribou.migrate import _parse_migration_name
 
 TEST_DB = "test.sqlite3"
 MIGRATIONS_DIR = "migrations"
@@ -377,6 +378,40 @@ def test_migration(sqlite_test_path):
         assert all((_table_exists(conn, t) for t in tables))
         actual_version = caribou.get_version(db_url)
         assert actual_version == v3, "%s != %s" % (actual_version, v3)
+
+
+def test_parse_migration_name():
+    """assert _parse_migration_name handles all naming conventions"""
+    # bare digits
+    assert _parse_migration_name("20091112130101_my_migration") == (
+        "20091112130101",
+        "my_migration",
+    )
+    # v-prefix
+    assert _parse_migration_name("v20091112150200_new_style") == (
+        "20091112150200",
+        "new_style",
+    )
+    # double underscore stripped
+    assert _parse_migration_name("20091112130101__migration_one") == (
+        "20091112130101",
+        "migration_one",
+    )
+    # v-prefix with .py extension stripped by caller, but name portion only
+    assert _parse_migration_name("v20091112150200_create_users") == (
+        "20091112150200",
+        "create_users",
+    )
+    # garbage input
+    assert _parse_migration_name("not_a_migration") == (None, None)
+    # empty string
+    assert _parse_migration_name("") == (None, None)
+    # too short
+    assert _parse_migration_name("12345") == (None, None)
+    # v-prefix too short
+    assert _parse_migration_name("v12345") == (None, None)
+    # bare digits no name portion
+    assert _parse_migration_name("20091112130101") == ("20091112130101", "")
 
 
 def test_create_migration():
