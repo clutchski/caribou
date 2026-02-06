@@ -6,25 +6,28 @@ where filesystem discovery is not available -- you just import the
 migration modules directly and pass them as a list.
 
 Run from the repo root:
-    python examples/module_migrations.py
+    python -m examples.module_migrations
 """
 
 import os
-import sys
 import sqlite3
 import caribou
 
-# Add examples/ to the path so "from migrations import ..." works
-# regardless of where you run this script from.
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
-# Import the migration modules directly. In a real app these would
-# be regular package imports (from myapp.migrations import ...).
-from migrations import v20260206024658_create_users, v20260206024701_create_scores
+from examples.migrations import (
+    v20260206024658_create_users,
+    v20260206024701_create_scores,
+)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(HERE, "example.db")
-MODULES = [v20260206024658_create_users, v20260206024701_create_scores]
+
+MODULES = [
+    v20260206024658_create_users,
+    v20260206024701_create_scores,
+]
+
+V1 = "20260206024658"
+V2 = "20260206024701"
 
 
 def show(label):
@@ -45,11 +48,17 @@ def main():
     print("Module-based migrations")
     print()
 
-    caribou.upgrade(DB, MODULES)
-    show("after upgrade")
+    caribou.upgrade(DB, MODULES, V1)
+    show("after upgrade to v1")
+
+    caribou.upgrade(DB, MODULES, V2)
+    show("after upgrade to v2")
+
+    caribou.downgrade(DB, MODULES, V1)
+    show("after downgrade to v1")
 
     caribou.downgrade(DB, MODULES, "0")
-    show("after downgrade")
+    show("after downgrade to v0")
 
     os.remove(DB)
 

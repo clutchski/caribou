@@ -32,11 +32,17 @@ def main():
     print("Directory-based migrations")
     print()
 
+    caribou.upgrade(DB, MIGRATIONS, "20260206024658")
+    show("after upgrade to v1")
+
     caribou.upgrade(DB, MIGRATIONS)
-    show("after upgrade")
+    show("after upgrade to v2")
+
+    caribou.downgrade(DB, MIGRATIONS, "20260206024658")
+    show("after downgrade to v1")
 
     caribou.downgrade(DB, MIGRATIONS, "0")
-    show("after downgrade")
+    show("after downgrade to v0")
 
     os.remove(DB)
 

@@ -120,9 +120,9 @@ class Migration:
     def get_version(self):
         if hasattr(self, "_version"):
             return self._version
-        version, _ = _parse_migration_name(self.filename)
+        version, _ = _parse_migration_name(self.module_name)
         if version is None:
-            raise InvalidNameError(self.filename)
+            raise InvalidNameError(self.filename or self.module_name)
         return version
 
     @classmethod
@@ -262,6 +262,7 @@ def load_migrations(directory):
         raise Error(f"{directory} is not a directory.")
     wildcard = os.path.join(directory, "*.py")
     migration_files = glob.glob(wildcard)
+    migration_files = [f for f in migration_files if os.path.basename(f) != "__init__.py"]
     return [Migration(f) for f in migration_files]
 
 
@@ -283,7 +284,6 @@ def upgrade(db_url, migrations_or_dir, version=None):
     upgrade to the most recent version.
     """
     with contextlib.closing(Database(db_url)) as db:
-        db = Database(db_url)
         if not db.is_version_controlled():
             db.initialize_version_control()
         migrations = _load(migrations_or_dir)
