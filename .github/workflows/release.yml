@@ -35,6 +35,7 @@ jobs:
 
     permissions:
       id-token: write
+      contents: write
 
     steps:
     - name: Checkout code
@@ -51,3 +52,9 @@ jobs:
 
     - name: Publish to PyPI
       run: uv publish --trusted-publishing always
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        generate_release_notes: true
+        files: dist/*
