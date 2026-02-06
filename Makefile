@@ -26,13 +26,13 @@ lint:
 	ruff check caribou tests
 
 build:
-	flit build
+	uv build
 
 install:
 	flit install
 
 publish: check
-	flit publish
+	uv publish
 
 fmt:
 	ruff format caribou tests
@@ -41,9 +41,13 @@ fmt:
 fmtcheck:
 	ruff format --check caribou tests
 
-
-#
-# tag
-# git tag 0.4.1
-# git push --tags
-# 
+release:
+ifndef VERSION
+	$(error VERSION is required. Usage: make release VERSION=0.5.0)
+endif
+	sed -i '' 's/__version__ = ".*"/__version__ = "$(VERSION)"/' caribou/__init__.py
+	git add caribou/__init__.py
+	git commit -m "Bump version to $(VERSION)"
+	git tag "v$(VERSION)"
+	git push origin master
+	git push origin "v$(VERSION)"
