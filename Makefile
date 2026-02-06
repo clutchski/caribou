@@ -41,13 +41,7 @@ fmt:
 fmtcheck:
 	ruff format --check caribou tests
 
+release: VERSION = $(shell python -c "import caribou; print(caribou.__version__)")
 release:
-ifndef VERSION
-	$(error VERSION is required. Usage: make release VERSION=0.5.0)
-endif
-	sed -i '' 's/__version__ = ".*"/__version__ = "$(VERSION)"/' caribou/__init__.py
-	git add caribou/__init__.py
-	git commit -m "Bump version to $(VERSION)"
 	git tag "v$(VERSION)"
-	git push origin master
 	git push origin "v$(VERSION)"
