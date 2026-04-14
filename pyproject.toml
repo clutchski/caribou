@@ -29,7 +29,7 @@ Home = "https://github.com/clutchski/caribou"
 caribou = "caribou.cli:main"
 
 [dependency-groups]
-dev = ["pytest==9.0.2", "tox==4.34.1", "ruff>=0.11"]
+dev = ["pytest==9.0.3", "tox==4.34.1", "ruff>=0.11"]
 
 [tool.ruff]
 line-length = 88
